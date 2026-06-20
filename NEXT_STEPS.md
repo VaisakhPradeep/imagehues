@@ -9,58 +9,37 @@ This doc covers how to run, deploy, and continue building the site.
 | Step | Status |
 |---|---|
 | Phase 1 — Bug fixes | ✅ Done |
-| Phase 2 — Astro migration | ✅ Done (branch: `feat/astro-foundation`) |
+| Phase 2 — Astro migration | ✅ Done |
 | Local `.env` with GA4 Measurement ID | ✅ Done |
 | GitHub Actions variable `PUBLIC_GA_MEASUREMENT_ID` | ✅ Done |
-| Switch GitHub Pages to GitHub Actions | ⬜ **Do next** |
-| Push / merge and deploy to production | ⬜ **Do next** |
-| Verify live site + GA4 tracking | ⬜ After deploy |
+| Switch GitHub Pages to GitHub Actions | ✅ Done |
+| Rename `master` → `main` (local) | ✅ Done |
+| Merge `feat/astro-foundation` into `main` | ✅ Done |
+| Push `main` to GitHub & delete remote `master` | ⬜ **Do next** |
+| Verify live site + GA4 tracking | ⬜ After push |
 | Phase 3 — SEO pages & new features | ⬜ After go-live |
 
 ---
 
 ## What to do next (in order)
 
-### 1. Commit any remaining changes
+### 1. Push `main` to GitHub
 
-You have uncommitted edits on `feat/astro-foundation` (e.g. favourites page header removed). Commit and push:
+Everything is merged locally on `main`. Push from your machine (must be authenticated as **VaisakhPradeep**):
 
 ```bash
 cd /Users/vaisakh/vasp/imagehues/imagehues
-git add -A
-git commit -m "Remove favourites page header"
-git push -u origin feat/astro-foundation
+git push -u origin main
+git push origin --delete master   # remove old default branch on GitHub
 ```
 
-### 2. Switch GitHub Pages to GitHub Actions
+Then set **main** as the default branch on GitHub: **Settings → General → Default branch → main**.
 
-**Required before the new site can go live.** The site no longer deploys from raw HTML in the repo root — it deploys the `dist/` folder built by CI.
+The **Deploy to GitHub Pages** workflow runs automatically on push to `main`.
 
-1. Go to [github.com/VaisakhPradeep/imagehues/settings/pages](https://github.com/VaisakhPradeep/imagehues/settings/pages)
-2. Under **Build and deployment → Source**, select **GitHub Actions**
-3. Save
+Monitor: **GitHub repo → Actions → Deploy to GitHub Pages**
 
-### 3. Merge to `main` and deploy
-
-**Option A — Pull request (recommended)**
-
-1. Open a PR: `feat/astro-foundation` → `main` (or `master`)
-2. Review and merge
-3. The **Deploy to GitHub Pages** workflow runs automatically on push to `main`
-
-**Option B — Merge locally**
-
-```bash
-git checkout main   # or master
-git merge feat/astro-foundation
-git push origin main
-```
-
-Monitor the deploy: **GitHub repo → Actions → Deploy to GitHub Pages**
-
-> The workflow reads `PUBLIC_GA_MEASUREMENT_ID` from your repository variable — no extra GA4 step needed at deploy time.
-
-### 4. Verify production
+### 2. Verify production
 
 After the workflow succeeds (green checkmark), confirm these URLs work:
 
@@ -78,7 +57,7 @@ Functional checks:
 - [ ] Favourites page shows saved palettes (or empty state)
 - [ ] Old bookmarks (`/about.html`, `/favourites.html`) redirect correctly
 
-### 5. Confirm GA4 is tracking
+### 3. Confirm GA4 is tracking
 
 1. Open [Google Analytics](https://analytics.google.com) → **ImageHues - GA4** property
 2. Go to **Reports → Realtime**
@@ -87,7 +66,7 @@ Functional checks:
 
 To confirm the right tag is live, view page source on imagehues.com and search for your `G-` Measurement ID (not `UA-120902603-2`).
 
-### 6. Clean up after GA4 is confirmed (optional)
+### 4. Clean up after GA4 is confirmed (optional)
 
 Once Realtime shows visits correctly:
 
@@ -305,7 +284,7 @@ npm run build:palettes  # Regenerate palettes + url-map only
 1. ✅ Phase 1 — Bug fixes
 2. ✅ Phase 2 — Astro + palettes + migration
 3. ✅ GA4 configured (local `.env` + GitHub variable)
-4. ⬜ **Deploy to production** ← you are here
+4. ⬜ **Push `main` and go live** ← you are here
 5. ⬜ Verify GA4 Realtime on live site
 6. ⬜ Phase 3 — Palette detail pages + SEO landing pages
 7. ⬜ Phase 3 — Category pages, OG images, performance
