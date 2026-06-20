@@ -51,10 +51,6 @@ Pushes to `main` trigger the **Deploy to GitHub Pages** workflow automatically.
 
 Production also needs the `PUBLIC_GA_MEASUREMENT_ID` repository variable set in GitHub → Settings → Actions → Variables.
 
-## Further reading
-
-See [NEXT_STEPS.md](./NEXT_STEPS.md) for deployment checklist, Phase 3 roadmap, and troubleshooting.
-
 ## License
 
 MIT
