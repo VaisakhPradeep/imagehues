@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const scripts = ['/js/favourites.js'];
+---
+
+<BaseLayout
+  title="Your Favourite Color Palettes – Image Hues"
+  description="View and manage your saved color palettes from Image Hues. Favourites are stored locally in your browser — no login required."
+  canonicalPath="/favourites/"
+  logoClass="static"
+  scripts={scripts}
+>
+  <div class="header-container">
+    <div class="heading">
+      <h1>Your <span>Favourites</span></h1>
+    </div>
+    <h3>Color palettes you've saved from Image Hues.</h3>
+  </div>
+
+  <div class="image-container"></div>
+
+  <div id="empty-favourites-page">
+    <img src="/images/empty.png" alt="No favourites yet" />
+    <p class="message">
+      Hmm, no favourites yet!<br />
+      Click on the heart over any image to add :)
+    </p>
+    <p class="info">
+      Favourites uses your browser local storage so that you don't need to login to the site
+    </p>
+  </div>
+</BaseLayout>

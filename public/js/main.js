@@ -7,8 +7,8 @@ let footer = document.querySelector("footer");
 let imagesSetsLoaded = 0;
 let flag = true;
 let favouriteImages = [];
-let imageProperties = { url: "", color1: "", color2: "", color3: "", color4: "" };
 let displayedImageUrls = [];
+let precomputedPalettes = {};
 let rowUrl = [];
 let continuousLoad = true;
 let scrollOffset = 70;
@@ -56,36 +56,36 @@ function fetchImage() {
 
 //Fetch image urls from local json data
 function fetchImageFromJson() {
-    axios.get('https://imagehues.com/urls.json').then(function (response) {
+    axios.get('./urls.json').then(function (response) {
         displayedImageUrls = response.data[0].urls;
+        displayedImageUrls = shuffle(displayedImageUrls);
         createImageSetFromJson();
-    })
+    });
 }
 
-function fetchLocalImages(){
-    for(let i = 0; i<totalImages; i++){
-        displayedImageUrls[i] = "../unsplash_images/img"+i+".jpg";
+function fetchLocalImages() {
+    for (let i = 0; i < totalImages; i++) {
+        displayedImageUrls[i] = "/unsplash_images/img" + i + ".jpg";
     }
-    createImageSetFromJson();
+    displayedImageUrls = shuffle(displayedImageUrls);
 }
 
 
 //Load image set from local json data
 function loadImageSetFromJson() {
-    // fetchImageFromJson();
-    fetchLocalImages();
+    createImageSetFromJson();
 }
 
 //Create image set from local json data
 function createImageSetFromJson() {
-    displayedImageUrls = shuffle(displayedImageUrls);
-
     if (imagesSetsLoaded < totalImageSets) {
 
         loader.style.display = "flex";
         footer.style.display = "none";
 
-        for (let i = imagesSetsLoaded * imagesPerLoad + 1; i < imagesPerLoad * (imagesSetsLoaded + 1); i++) {
+        const start = imagesSetsLoaded * imagesPerLoad;
+        const end = Math.min(start + imagesPerLoad, displayedImageUrls.length);
+        for (let i = start; i < end; i++) {
             createImageCard(displayedImageUrls[i]);
         }
 
@@ -191,22 +191,19 @@ function loadImageSet() {
 function findColors(item) {
 
     const img = item.children[0];
-
-    const colorThief = new ColorThief();
     const color1 = img.nextElementSibling.children[0];
     const color2 = img.nextElementSibling.children[1];
     const color3 = img.nextElementSibling.children[2];
     const color4 = img.nextElementSibling.children[3];
+    const imageUrl = window.normalizeImageUrl(img.getAttribute('src'));
+    const cached = precomputedPalettes[imageUrl];
 
-    // if (img.complete) {
-    //     fillColor(colorThief.getPalette(img, 4));
-    // } else {
-    //     img.addEventListener('load', function () {
-    //         fillColor(colorThief.getPalette(img, 4));
-    //         img.className = "loaded";
-    //     });
-    // }
+    if (cached && cached.length >= 4) {
+        fillColor(cached.map(function (entry) { return entry.rgb; }));
+        return;
+    }
 
+    const colorThief = new ColorThief();
     fillColor(colorThief.getPalette(img, 4, 5));
 
     function fillColor(colors) {
@@ -215,10 +212,10 @@ function findColors(item) {
         color3.style.backgroundColor = `rgb(${colors[2][0]}, ${colors[2][1]}, ${colors[2][2]})`;
         color4.style.backgroundColor = `rgb(${colors[3][0]}, ${colors[3][1]}, ${colors[3][2]})`;
 
-        color1.children[0].innerHTML = "<span>" + rgbToHex(colors[0][0], colors[0][1], colors[0][1]) + "</span";
-        color2.children[0].innerHTML = "<span>" + rgbToHex(colors[1][0], colors[1][1], colors[1][1]) + "</span";
-        color3.children[0].innerHTML = "<span>" + rgbToHex(colors[2][0], colors[2][1], colors[2][1]) + "</span";
-        color4.children[0].innerHTML = "<span>" + rgbToHex(colors[3][0], colors[3][1], colors[3][1]) + "</span";
+        color1.children[0].innerHTML = "<span>" + rgbToHex(colors[0][0], colors[0][1], colors[0][2]) + "</span>";
+        color2.children[0].innerHTML = "<span>" + rgbToHex(colors[1][0], colors[1][1], colors[1][2]) + "</span>";
+        color3.children[0].innerHTML = "<span>" + rgbToHex(colors[2][0], colors[2][1], colors[2][2]) + "</span>";
+        color4.children[0].innerHTML = "<span>" + rgbToHex(colors[3][0], colors[3][1], colors[3][2]) + "</span>";
 
     }
 
@@ -236,35 +233,43 @@ function onColorClick(e) {
     copyToClipboard(hexColor);
     e.target.children[0].innerHTML = "<span>Copied</span>";
     setTimeout(() => {
-        e.target.children[0].innerHTML = "<span>" + hexColor + "</span";
+        e.target.children[0].innerHTML = "<span>" + hexColor + "</span>";
     }, 2000);
+}
 
-    function getRGB(str) {
-        var match = str.match(/rgba?\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)?(?:, ?(\d(?:\.\d?))\))?/);
-        return match ? {
-            red: match[1],
-            green: match[2],
-            blue: match[3]
-        } : {};
+function getRGB(str) {
+    var match = str.match(/rgba?\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)?(?:, ?(\d(?:\.\d?))\))?/);
+    return match ? {
+        red: match[1],
+        green: match[2],
+        blue: match[3]
+    } : {};
+}
+
+function copyToClipboard(str) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(str).catch(fallbackCopyToClipboard);
+        return;
     }
+    fallbackCopyToClipboard(str);
+}
 
-    function copyToClipboard(str) {
-        const el = document.createElement('textarea');
-        el.value = str;
-        el.setAttribute('readonly', '');
-        el.style.position = 'absolute';
-        el.style.left = '-9999px';
-        document.body.appendChild(el);
-        const selected =
-            document.getSelection().rangeCount > 0 ? document.getSelection().getRangeAt(0) : false;
-        el.select();
-        document.execCommand('copy');
-        document.body.removeChild(el);
-        if (selected) {
-            document.getSelection().removeAllRanges();
-            document.getSelection().addRange(selected);
-        }
-    };
+function fallbackCopyToClipboard(str) {
+    const el = document.createElement('textarea');
+    el.value = str;
+    el.setAttribute('readonly', '');
+    el.style.position = 'absolute';
+    el.style.left = '-9999px';
+    document.body.appendChild(el);
+    const selected =
+        document.getSelection().rangeCount > 0 ? document.getSelection().getRangeAt(0) : false;
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    if (selected) {
+        document.getSelection().removeAllRanges();
+        document.getSelection().addRange(selected);
+    }
 }
 
 
@@ -289,39 +294,43 @@ function rgbToHex(r, g, b) {
 
 //add or remove to/from favourites
 function addRemoveFavourites(event) {
-
-    event.currentTarget.classList.add("added");
     if (localStorage.getItem("imageHueUrl")) {
         favouriteImages = JSON.parse(localStorage.getItem("imageHueUrl"));
     }
-    let imageUrl = event.currentTarget.parentElement.children[0].getAttribute("src");
-    let colorPalette = event.currentTarget.parentElement.children[1];
-    imageProperties.url = imageUrl;
-    imageProperties.color1 = colorPalette.children[0].style.backgroundColor;
-    imageProperties.color2 = colorPalette.children[1].style.backgroundColor;
-    imageProperties.color3 = colorPalette.children[2].style.backgroundColor;
-    imageProperties.color4 = colorPalette.children[3].style.backgroundColor;
+    let imageUrl = window.normalizeImageUrl(
+        event.currentTarget.parentElement.children[0].getAttribute("src")
+    );
+
     for (let i = 0; i < favouriteImages.length; i++) {
-        if (imageUrl === favouriteImages[i].url) {
+        if (window.imageUrlsMatch(imageUrl, favouriteImages[i].url)) {
             event.currentTarget.classList.remove("added");
             favouriteImages.splice(i, 1);
             localStorage.setItem("imageHueUrl", JSON.stringify(favouriteImages));
+            return;
         }
     }
-    favouriteImages.push(imageProperties);
-    localStorage.setItem("imageHueUrl", JSON.stringify(favouriteImages));
 
+    let colorPalette = event.currentTarget.parentElement.children[1];
+    favouriteImages.push({
+        url: imageUrl,
+        color1: colorPalette.children[0].style.backgroundColor,
+        color2: colorPalette.children[1].style.backgroundColor,
+        color3: colorPalette.children[2].style.backgroundColor,
+        color4: colorPalette.children[3].style.backgroundColor,
+    });
+    event.currentTarget.classList.add("added");
+    localStorage.setItem("imageHueUrl", JSON.stringify(favouriteImages));
 }
 
 
 //set image as favourite if the image displayed has already been added to favourites
 function loadFavourites(item) {
-    const imageUrl = item.children[0].getAttribute("src");
+    const imageUrl = window.normalizeImageUrl(item.children[0].getAttribute("src"));
     if (localStorage.getItem("imageHueUrl")) {
         favouriteImages = JSON.parse(localStorage.getItem("imageHueUrl"));
     }
     for (let i = 0; i < favouriteImages.length; i++) {
-        if (imageUrl === favouriteImages[i].url) {
+        if (window.imageUrlsMatch(imageUrl, favouriteImages[i].url)) {
             item.querySelector(".favourite").classList.add("added");
         }
     }
@@ -389,12 +398,33 @@ function storeUrl(urls) {
 // }
 
 
-if (loadFromJson) {
-    loadImageSetFromJson();
+function loadPrecomputedPalettes() {
+    return fetch('/data/palettes.json')
+        .then(function (response) {
+            if (!response.ok) {
+                return {};
+            }
+            return response.json();
+        })
+        .then(function (data) {
+            precomputedPalettes = data || {};
+        })
+        .catch(function () {
+            precomputedPalettes = {};
+        });
 }
-else {
-    loadImageSet()
+
+function startApp() {
+    if (loadFromJson) {
+        fetchLocalImages();
+        loadImageSetFromJson();
+    }
+    else {
+        loadImageSet();
+    }
 }
+
+loadPrecomputedPalettes().finally(startApp);
 
 
 

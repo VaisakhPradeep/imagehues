@@ -73,10 +73,10 @@ function createImage(index, imageProperties) {
     const color3Hex = rgbToHex(getRGB(color3.style.backgroundColor).red, getRGB(color3.style.backgroundColor).green, getRGB(color3.style.backgroundColor).blue);
     const color4Hex = rgbToHex(getRGB(color4.style.backgroundColor).red, getRGB(color4.style.backgroundColor).green, getRGB(color4.style.backgroundColor).blue);
 
-    color1.children[0].innerHTML = "<span>" + color1Hex + "</span";
-    color2.children[0].innerHTML = "<span>" + color2Hex + "</span";
-    color3.children[0].innerHTML = "<span>" + color3Hex + "</span";
-    color4.children[0].innerHTML = "<span>" + color4Hex + "</span";
+    color1.children[0].innerHTML = "<span>" + color1Hex + "</span>";
+    color2.children[0].innerHTML = "<span>" + color2Hex + "</span>";
+    color3.children[0].innerHTML = "<span>" + color3Hex + "</span>";
+    color4.children[0].innerHTML = "<span>" + color4Hex + "</span>";
     // findColors(item);
 
 }
@@ -92,11 +92,19 @@ function onColorClick(e) {
     copyToClipboard(hexColor);
     e.target.children[0].innerHTML = "<span>Copied</span>";
     setTimeout(() => {
-        e.target.children[0].innerHTML = "<span>" + hexColor + "</span";
+        e.target.children[0].innerHTML = "<span>" + hexColor + "</span>";
     }, 4000);
 
 
     function copyToClipboard(str) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(str).catch(fallbackCopyToClipboard);
+            return;
+        }
+        fallbackCopyToClipboard(str);
+    }
+
+    function fallbackCopyToClipboard(str) {
         const el = document.createElement('textarea');
         el.value = str;
         el.setAttribute('readonly', '');
@@ -112,7 +120,7 @@ function onColorClick(e) {
             document.getSelection().removeAllRanges();
             document.getSelection().addRange(selected);
         }
-    };
+    }
 }
 
 
@@ -144,9 +152,11 @@ function getRGB(str) {
 
 function removeFavourites(event) {
 
-    let imageUrl = event.currentTarget.parentElement.children[0].getAttribute("src");
+    let imageUrl = window.normalizeImageUrl(
+        event.currentTarget.parentElement.children[0].getAttribute("src")
+    );
     for (let i = 0; i < favouriteImages.length; i++) {
-        if (imageUrl === favouriteImages[i].url) {
+        if (window.imageUrlsMatch(imageUrl, favouriteImages[i].url)) {
             event.currentTarget.classList.remove("added");
             favouriteImages.splice(i, 1);
             localStorage.setItem("imageHueUrl", JSON.stringify(favouriteImages));

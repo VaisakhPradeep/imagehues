@@ -1,0 +1,91 @@
+---
+export interface Props {
+  title: string;
+  description: string;
+  canonicalPath: string;
+  logoClass?: string;
+  scripts?: string[];
+}
+
+const site = 'https://imagehues.com';
+const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
+const legacyGaId = 'UA-120902603-2';
+
+const { title, description, canonicalPath, logoClass = '', scripts = [] } = Astro.props;
+const canonical = `${site}${canonicalPath}`;
+const ogImage = `${site}/images/logo.png`;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{title}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <link rel="shortcut icon" href="/images/logo.png" type="image" sizes="16x16" />
+    <link rel="apple-touch-icon" sizes="114x114" href="/images/logo.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="/images/logo.png" />
+    <link rel="apple-touch-icon" href="/images/logo.png" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:400,600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Montserrat:700&display=swap"
+      rel="stylesheet"
+    />
+    {
+      gaId && gaId !== 'G-XXXXXXXXXX' && (
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
+      )
+    }
+    <script is:inline define:vars={{ gaId, legacyGaId }}>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      if (gaId && gaId !== 'G-XXXXXXXXXX') {
+        gtag('config', gaId);
+      } else {
+        gtag('config', legacyGaId);
+      }
+    </script>
+  </head>
+  <body>
+    <div class="page-wrapper">
+      <nav class="top-navigation">
+        <a id="logo" href="/">
+          <img src="/images/logo.svg" alt="Image Hues logo" />
+          <h4 class={logoClass}>Image<span>Hues</span></h4>
+        </a>
+        <ul id="nav-items">
+          <li><a href="/" class="home">Home</a></li>
+          <li><a href="/favourites/" class="favourites">Favourites</a></li>
+          <li><a href="/about/" class="about">About</a></li>
+        </ul>
+      </nav>
+      <slot />
+    </div>
+    <slot name="after-wrapper" />
+    <script is:inline src="/js/url-map.js"></script>
+    <script is:inline src="/js/migrate.js"></script>
+    {scripts.map((script) => <script is:inline src={script}></script>)}
+    <script is:inline src="/js/common.js"></script>
+  </body>
+</html>
+
+<style is:global lang="scss">
+  @import '../styles/style.sass';
+</style>
