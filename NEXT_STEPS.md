@@ -1,12 +1,104 @@
 # Image Hues — What To Do Next
 
-This doc covers how to run, deploy, and continue building the site after the Phase 1 fixes and Phase 2 Astro migration.
+This doc covers how to run, deploy, and continue building the site.
 
 ---
 
-## Current state (as of Phase 2)
+## Progress
 
-The site is now an **Astro static site** that builds to `dist/` and deploys via **GitHub Actions**.
+| Step | Status |
+|---|---|
+| Phase 1 — Bug fixes | ✅ Done |
+| Phase 2 — Astro migration | ✅ Done (branch: `feat/astro-foundation`) |
+| Local `.env` with GA4 Measurement ID | ✅ Done |
+| GitHub Actions variable `PUBLIC_GA_MEASUREMENT_ID` | ✅ Done |
+| Switch GitHub Pages to GitHub Actions | ⬜ **Do next** |
+| Push / merge and deploy to production | ⬜ **Do next** |
+| Verify live site + GA4 tracking | ⬜ After deploy |
+| Phase 3 — SEO pages & new features | ⬜ After go-live |
+
+---
+
+## What to do next (in order)
+
+### 1. Commit any remaining changes
+
+You have uncommitted edits on `feat/astro-foundation` (e.g. favourites page header removed). Commit and push:
+
+```bash
+cd /Users/vaisakh/vasp/imagehues/imagehues
+git add -A
+git commit -m "Remove favourites page header"
+git push -u origin feat/astro-foundation
+```
+
+### 2. Switch GitHub Pages to GitHub Actions
+
+**Required before the new site can go live.** The site no longer deploys from raw HTML in the repo root — it deploys the `dist/` folder built by CI.
+
+1. Go to [github.com/VaisakhPradeep/imagehues/settings/pages](https://github.com/VaisakhPradeep/imagehues/settings/pages)
+2. Under **Build and deployment → Source**, select **GitHub Actions**
+3. Save
+
+### 3. Merge to `main` and deploy
+
+**Option A — Pull request (recommended)**
+
+1. Open a PR: `feat/astro-foundation` → `main` (or `master`)
+2. Review and merge
+3. The **Deploy to GitHub Pages** workflow runs automatically on push to `main`
+
+**Option B — Merge locally**
+
+```bash
+git checkout main   # or master
+git merge feat/astro-foundation
+git push origin main
+```
+
+Monitor the deploy: **GitHub repo → Actions → Deploy to GitHub Pages**
+
+> The workflow reads `PUBLIC_GA_MEASUREMENT_ID` from your repository variable — no extra GA4 step needed at deploy time.
+
+### 4. Verify production
+
+After the workflow succeeds (green checkmark), confirm these URLs work:
+
+- [ ] [https://imagehues.com/](https://imagehues.com/)
+- [ ] [https://imagehues.com/favourites/](https://imagehues.com/favourites/)
+- [ ] [https://imagehues.com/about/](https://imagehues.com/about/)
+- [ ] [https://imagehues.com/sitemap-index.xml](https://imagehues.com/sitemap-index.xml)
+- [ ] [https://imagehues.com/robots.txt](https://imagehues.com/robots.txt)
+
+Functional checks:
+
+- [ ] Home page loads image cards with color swatches
+- [ ] Clicking a swatch copies the hex code
+- [ ] Heart add/remove works
+- [ ] Favourites page shows saved palettes (or empty state)
+- [ ] Old bookmarks (`/about.html`, `/favourites.html`) redirect correctly
+
+### 5. Confirm GA4 is tracking
+
+1. Open [Google Analytics](https://analytics.google.com) → **ImageHues - GA4** property
+2. Go to **Reports → Realtime**
+3. Visit [https://imagehues.com](https://imagehues.com) in another tab
+4. You should appear as an active user within ~30 seconds
+
+To confirm the right tag is live, view page source on imagehues.com and search for your `G-` Measurement ID (not `UA-120902603-2`).
+
+### 6. Clean up after GA4 is confirmed (optional)
+
+Once Realtime shows visits correctly:
+
+- Remove the legacy `UA-120902603-2` fallback from `src/layouts/BaseLayout.astro`
+- Commit and deploy again
+
+---
+
+## Current architecture
+
+The site is an **Astro static site** that builds to `dist/` and deploys via **GitHub Actions**.
 
 | What | Where |
 |---|---|
@@ -17,92 +109,14 @@ The site is now an **Astro static site** that builds to `dist/` and deploys via 
 | Images + data | `public/images/`, `public/unsplash_images/`, `public/urls.json` |
 | Precomputed palettes | `public/data/palettes.json` (generated) |
 | URL migration map | `public/js/url-map.js` (generated) |
+| GA4 ID (local) | `.env` → `PUBLIC_GA_MEASUREMENT_ID` |
+| GA4 ID (production) | GitHub → Settings → Actions → Variables |
 | Production output | `dist/` (do not edit by hand) |
 
 **Existing users are protected:**
 - Favourites still use `localStorage` key `imageHueUrl`
 - `migrate.js` runs once per browser and maps old Unsplash URLs → local image paths
 - Old bookmarks (`/about.html`, `/favourites.html`) redirect to the new URLs
-
----
-
-## Immediate checklist (do these before going live)
-
-### 1. Install dependencies (first time only)
-
-```bash
-cd /Users/vaisakh/vasp/imagehues/imagehues
-npm install
-```
-
-### 2. Test locally
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:4321](http://localhost:4321) and verify:
-
-- [ ] Home page loads image cards with color swatches
-- [ ] Clicking a swatch copies the hex code
-- [ ] Heart add/remove works
-- [ ] `/favourites/` shows saved palettes
-- [ ] `/about/` loads correctly
-- [ ] Nav highlights the active page
-
-Optional production preview:
-
-```bash
-npm run build
-npm run preview
-```
-
-### 3. Switch GitHub Pages to GitHub Actions
-
-**This is required.** The site no longer deploys by pushing raw HTML to the repo root. It now deploys the `dist/` folder built by CI.
-
-1. Go to [github.com/VaisakhPradeep/imagehues/settings/pages](https://github.com/VaisakhPradeep/imagehues/settings/pages)
-2. Under **Build and deployment → Source**, select **GitHub Actions**
-3. Save
-
-### 4. Push to `main`
-
-Commit and push all changes. The workflow in `.github/workflows/deploy.yml` will:
-
-1. Install dependencies
-2. Run `npm run build` (palettes + Astro)
-3. Deploy `dist/` to GitHub Pages
-
-Monitor the run at: **GitHub repo → Actions → Deploy to GitHub Pages**
-
-After deploy, verify live:
-
-- [ ] [https://imagehues.com/](https://imagehues.com/)
-- [ ] [https://imagehues.com/favourites/](https://imagehues.com/favourites/)
-- [ ] [https://imagehues.com/about/](https://imagehues.com/about/)
-- [ ] [https://imagehues.com/sitemap-index.xml](https://imagehues.com/sitemap-index.xml)
-- [ ] [https://imagehues.com/robots.txt](https://imagehues.com/robots.txt)
-
-### 5. Set up GA4 (recommended)
-
-Universal Analytics (UA) is sunset. The site **falls back to your old UA tag** until you add a GA4 ID.
-
-**Locally**
-
-1. Copy `.env.example` → `.env`
-2. Replace the placeholder:
-
-```bash
-PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
-```
-
-**On GitHub (for production builds)**
-
-1. Repo → **Settings → Secrets and variables → Actions → Variables**
-2. Add variable: `PUBLIC_GA_MEASUREMENT_ID` = your `G-XXXXXXXXXX` ID
-3. Push any commit (or re-run the deploy workflow) to rebuild with GA4
-
-To create a GA4 property: [https://analytics.google.com](https://analytics.google.com) → Admin → Create Property → Web stream → copy Measurement ID.
 
 ---
 
@@ -114,6 +128,8 @@ To create a GA4 property: [https://analytics.google.com](https://analytics.googl
 npm run dev
 ```
 
+Open [http://localhost:4321](http://localhost:4321)
+
 ### Production build
 
 ```bash
@@ -123,6 +139,12 @@ npm run build
 This runs two steps:
 1. `build:palettes` — extracts colors from images (skips if already up to date)
 2. `astro build` — compiles pages + Sass into `dist/`
+
+### Preview production build
+
+```bash
+npm run preview
+```
 
 ### Rebuild palettes only
 
@@ -213,10 +235,6 @@ Generate a small preview image per palette (image + 4 swatches) for better socia
 - Export favourites as JSON / CSS variables
 - Shareable link (would need backend or encoded URL — larger scope)
 
-### 6. Remove UA fallback
-
-Once GA4 is confirmed working, remove the legacy `UA-120902603-2` fallback from `BaseLayout.astro`.
-
 ---
 
 ## Existing users — what to expect
@@ -255,39 +273,41 @@ Favourites are **per-browser** (`localStorage`). They won't appear on a differen
 
 ### Styles look wrong
 
-Edit `src/styles/style.sass`, not `public/styles/`. The old `style.css` at repo root was removed; Sass compiles at build time.
+Edit `src/styles/style.sass`, not `public/styles/`. Sass compiles at build time.
 
-### GA4 not tracking
+### GA4 not tracking after deploy
 
-- Confirm `PUBLIC_GA_MEASUREMENT_ID` is set in GitHub Actions variables
-- Re-run the deploy workflow after adding the variable
-- Check GA4 Realtime view after visiting the live site
+- Confirm `PUBLIC_GA_MEASUREMENT_ID` is set under **Settings → Actions → Variables** (repository variable, not environment)
+- Re-run the **Deploy to GitHub Pages** workflow after adding the variable
+- View page source on the live site — search for your `G-` ID
+- Check GA4 **Reports → Realtime** while browsing the site
 
 ---
 
 ## Quick reference
 
 ```bash
-npm install          # First-time setup
-npm run dev          # Local dev server (port 4321)
-npm run build        # Full production build
-npm run preview      # Preview dist/ locally
+npm install             # First-time setup
+npm run dev             # Local dev server (port 4321)
+npm run build           # Full production build
+npm run preview         # Preview dist/ locally
 npm run build:palettes  # Regenerate palettes + url-map only
 ```
 
-**Deploy:** Push to `main` → GitHub Actions builds and deploys automatically (after Pages source is set to GitHub Actions).
+**Deploy:** Merge to `main` → GitHub Actions builds and deploys automatically.
 
-**Domain:** `public/CNAME` contains `imagehues.com` — no change needed if DNS is already pointed at GitHub Pages.
+**Domain:** `public/CNAME` contains `imagehues.com` — no DNS change needed if already pointed at GitHub Pages.
 
 ---
 
-## Suggested order of work
+## Roadmap summary
 
-1. ✅ Phase 1 — Bug fixes (done)
-2. ✅ Phase 2 — Astro + palettes + migration (done)
-3. **Deploy to production** (checklist above)
-4. **Set up GA4**
-5. Phase 3 — Palette detail pages + SEO landing pages
-6. Phase 3 — Category pages, OG images, performance
+1. ✅ Phase 1 — Bug fixes
+2. ✅ Phase 2 — Astro + palettes + migration
+3. ✅ GA4 configured (local `.env` + GitHub variable)
+4. ⬜ **Deploy to production** ← you are here
+5. ⬜ Verify GA4 Realtime on live site
+6. ⬜ Phase 3 — Palette detail pages + SEO landing pages
+7. ⬜ Phase 3 — Category pages, OG images, performance
 
 If you want help starting Phase 3, the best first step is individual palette pages generated from `palettes.json`.
