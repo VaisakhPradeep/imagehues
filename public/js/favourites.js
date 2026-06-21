@@ -45,7 +45,7 @@ function createImage(index, imageProperties) {
     item.innerHTML = `
                 <img src="${imageProperties.url}" alt="Saved photo color palette" width="400" height="300" loading="lazy" decoding="async" class="w-full rounded-[6px]"/>
                 ${window.getColorPanelHtml({ className: 'color-panel' + index })}
-                <div class="favourite close absolute top-2.5 right-2.5 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-surface" onclick="removeFavourites(event)" aria-label="Remove palette from favourites" role="button" tabindex="0">
+                <div class="favourite close absolute top-4 right-4 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-surface" onclick="removeFavourites(event)" aria-label="Remove palette from favourites" role="button" tabindex="0">
                     <svg class="h-3 w-3" viewBox="0 0 12.012 12.01" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <g transform="translate(-5.994 -5.996)">
                         <g data-name="Layer 2">
