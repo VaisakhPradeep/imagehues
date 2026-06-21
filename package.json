@@ -3,6 +3,9 @@
   "type": "module",
   "version": "2.0.0",
   "private": true,
+  "engines": {
+    "node": "^20.19.5 || >=22.0.0"
+  },
   "scripts": {
     "dev": "astro dev",
     "build:palettes": "node scripts/build-palettes.mjs",
