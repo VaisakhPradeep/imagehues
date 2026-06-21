@@ -2,13 +2,16 @@ import { readFile, writeFile, readdir, mkdir, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
+import { extractPaletteFromPixels } from './lib/palette-extract.mjs';
 
 const require = createRequire(import.meta.url);
-const { getPalette } = require('colorthief');
+const sharp = require('sharp');
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
 const publicDir = path.join(root, 'public');
+const paletteExtractPath = path.join(__dirname, 'lib', 'palette-extract.mjs');
+const buildScriptPath = fileURLToPath(import.meta.url);
 const imagesDir = path.join(publicDir, 'unsplash_images');
 const dataDir = path.join(publicDir, 'data');
 const urlsPath = path.join(publicDir, 'urls.json');
@@ -23,9 +26,11 @@ async function shouldSkipPaletteBuild() {
   }
 
   try {
-    const [paletteStats, urlMapStats] = await Promise.all([
+    const [paletteStats, urlMapStats, extractStats, buildScriptStats] = await Promise.all([
       stat(palettesPath),
       stat(urlMapPath),
+      stat(paletteExtractPath),
+      stat(buildScriptPath),
     ]);
     const imageFiles = await readdir(imagesDir);
     let newestImageTime = 0;
@@ -38,6 +43,8 @@ async function shouldSkipPaletteBuild() {
 
     return (
       paletteStats.mtimeMs > newestImageTime &&
+      paletteStats.mtimeMs > extractStats.mtimeMs &&
+      paletteStats.mtimeMs > buildScriptStats.mtimeMs &&
       urlMapStats.mtimeMs > newestImageTime
     );
   } catch {
@@ -85,7 +92,11 @@ async function buildPalettes(imageFiles) {
     const imageUrl = normalizeLocalPath(Number(match[1]));
 
     try {
-      const colors = await getPalette(imagePath, 4, 5);
+      const { data, info } = await sharp(imagePath)
+        .ensureAlpha()
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+      const colors = extractPaletteFromPixels(data, info.width, info.height, 5, 4);
       palettes[imageUrl] = colors.map(([r, g, b]) => ({
         rgb: [r, g, b],
         hex: rgbToHex(r, g, b),

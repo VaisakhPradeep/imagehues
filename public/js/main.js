@@ -196,8 +196,7 @@ function getPaletteFromImage(img) {
         return cached.map(function (entry) { return entry.rgb; });
     }
 
-    const colorThief = new ColorThief();
-    return colorThief.getPalette(img, 4, 5);
+    return window.PaletteExtract.extractPaletteFromImage(img, 5, 4);
 }
 
 function findColors(item) {
