@@ -4,7 +4,6 @@ import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
-const { getPalette } = require('colorthief');
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
@@ -74,6 +73,7 @@ async function buildUrlMap(urls) {
 }
 
 async function buildPalettes(imageFiles) {
+  const { getPalette } = require('colorthief');
   const palettes = {};
   let processed = 0;
 

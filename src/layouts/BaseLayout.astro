@@ -4,15 +4,30 @@ export interface Props {
   description: string;
   canonicalPath: string;
   scripts?: string[];
+  includeUrlMap?: boolean;
 }
 
 const site = 'https://imagehues.com';
 const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
-const legacyGaId = 'UA-120902603-2';
 
-const { title, description, canonicalPath, scripts = [] } = Astro.props;
+const { title, description, canonicalPath, scripts = [], includeUrlMap = false } = Astro.props;
 const canonical = `${site}${canonicalPath}`;
 const ogImage = `${site}/images/OG_Image.png`;
+const hasGa = gaId && gaId !== 'G-XXXXXXXXXX';
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'Image Hues',
+  url: site,
+  applicationCategory: 'DesignApplication',
+  operatingSystem: 'Any',
+  description,
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+  },
+};
 ---
 
 <!DOCTYPE html>
@@ -28,7 +43,9 @@ const ogImage = `${site}/images/OG_Image.png`;
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImage} />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
@@ -38,27 +55,30 @@ const ogImage = `${site}/images/OG_Image.png`;
     <link rel="apple-touch-icon" href="/images/favicon/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/images/favicon/android-chrome-192x192.png" />
     <link rel="icon" type="image/png" sizes="512x512" href="/images/favicon/android-chrome-512x512.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@100..900&display=swap"
       rel="stylesheet"
     />
     {
-      gaId && gaId !== 'G-XXXXXXXXXX' && (
+      hasGa && (
         <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
       )
     }
-    <script is:inline define:vars={{ gaId, legacyGaId }}>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag('js', new Date());
-      if (gaId && gaId !== 'G-XXXXXXXXXX') {
-        gtag('config', gaId);
-      } else {
-        gtag('config', legacyGaId);
-      }
-    </script>
+    {
+      hasGa && (
+        <script is:inline define:vars={{ gaId }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', gaId);
+        </script>
+      )
+    }
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </head>
   <body>
     <div class="bg-background">
@@ -101,11 +121,11 @@ const ogImage = `${site}/images/OG_Image.png`;
       </main>
     </div>
     <slot name="after-wrapper" />
-    <script is:inline src="/js/url-map.js"></script>
-    <script is:inline src="/js/migrate.js"></script>
+    {includeUrlMap && <script is:inline src="/js/url-map.js"></script>}
+    {includeUrlMap && <script is:inline src="/js/migrate.js"></script>}
     <script is:inline src="/js/color-panel.js"></script>
-    {scripts.map((script) => <script is:inline src={script}></script>)}
     <script is:inline src="/js/common.js"></script>
+    {scripts.map((script) => <script is:inline src={script}></script>)}
   </body>
 </html>
 

@@ -6,19 +6,34 @@ let imagesSetsLoaded = 0;
 let flag = true;
 let favouriteImages = [];
 
-function loadImages() {
-    if (localStorage.getItem("imageHueUrl")) {
-        favouriteImages = JSON.parse(localStorage.getItem("imageHueUrl"));
-        for (let i = 0; i < favouriteImages.length; i++) {
-            createImage(i, favouriteImages[i]);
-        }
-        if (favouriteImages.length === 0) {
-            document.getElementById("empty-favourites-page").style.display = "block";
-        }
-        else {
-            document.getElementById("empty-favourites-page").style.display = "none";
-        }
+function getStoredFavourites() {
+    if (!localStorage.getItem("imageHueUrl")) {
+        return [];
     }
+
+    try {
+        const parsed = JSON.parse(localStorage.getItem("imageHueUrl"));
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+        return [];
+    }
+}
+
+function updateEmptyState() {
+    const emptyPage = document.getElementById("empty-favourites-page");
+    if (!emptyPage) {
+        return;
+    }
+
+    emptyPage.style.display = favouriteImages.length === 0 ? "block" : "none";
+}
+
+function loadImages() {
+    favouriteImages = getStoredFavourites();
+    for (let i = 0; i < favouriteImages.length; i++) {
+        createImage(i, favouriteImages[i]);
+    }
+    updateEmptyState();
 };
 
 loadImages();
@@ -28,10 +43,10 @@ function createImage(index, imageProperties) {
     let item = document.createElement('div');
     item.className = 'item' + imagesSetsLoaded + '' + index + ' item group relative m-0 w-auto animate-slide-up rounded-[18px] bg-surface p-2.5 shadow-card';
     item.innerHTML = `
-                <img src="${imageProperties.url}" alt="random image" class="w-full rounded-[6px]"/>
+                <img src="${imageProperties.url}" alt="Saved photo color palette" width="400" height="300" loading="lazy" decoding="async" class="w-full rounded-[6px]"/>
                 ${window.getColorPanelHtml({ className: 'color-panel' + index })}
-                <div class="favourite close absolute top-2.5 right-2.5 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-surface" onclick="removeFavourites(event)">
-                    <svg class="h-3 w-3" viewBox="0 0 12.012 12.01" xmlns="http://www.w3.org/2000/svg">
+                <div class="favourite close absolute top-2.5 right-2.5 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-surface" onclick="removeFavourites(event)" aria-label="Remove palette from favourites" role="button" tabindex="0">
+                    <svg class="h-3 w-3" viewBox="0 0 12.012 12.01" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <g transform="translate(-5.994 -5.996)">
                         <g data-name="Layer 2">
                         <path d="M13.41,12l4.3-4.29a1,1,0,1,0-1.42-1.42L12,10.59,7.71,6.29A1,1,0,0,0,6.29,7.71L10.59,12l-4.3,4.29a1,1,0,1,0,1.42,1.42L12,13.41l4.29,4.3a1,1,0,1,0,1.42-1.42Z" fill="#111" data-name="close"/>
@@ -71,21 +86,25 @@ function createImage(index, imageProperties) {
 
 
 function onColorClick(e) {
-    let rgbColor = getRGB(e.target.style.backgroundColor);
-    let red = rgbColor.red;
-    let green = rgbColor.green;
-    let blue = rgbColor.blue;
-    let hexColor = rgbToHex(red, green, blue);
+    const colorElement = e.currentTarget;
+    let rgbColor = getRGB(colorElement.style.backgroundColor);
+    if (!rgbColor.red) {
+        return;
+    }
+
+    let hexColor = rgbToHex(rgbColor.red, rgbColor.green, rgbColor.blue);
     copyToClipboard(hexColor);
-    e.target.children[0].innerHTML = "<span>Copied</span>";
+    colorElement.children[0].innerHTML = "<span>Copied</span>";
     setTimeout(() => {
-        e.target.children[0].innerHTML = "<span>" + hexColor + "</span>";
+        colorElement.children[0].innerHTML = "<span>" + hexColor + "</span>";
     }, 4000);
 
 
     function copyToClipboard(str) {
         if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(str).catch(fallbackCopyToClipboard);
+            navigator.clipboard.writeText(str).catch(function () {
+                fallbackCopyToClipboard(str);
+            });
             return;
         }
         fallbackCopyToClipboard(str);
@@ -98,14 +117,14 @@ function onColorClick(e) {
         el.style.position = 'absolute';
         el.style.left = '-9999px';
         document.body.appendChild(el);
-        const selected =
-            document.getSelection().rangeCount > 0 ? document.getSelection().getRangeAt(0) : false;
+        const selection = document.getSelection();
+        const selected = selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : false;
         el.select();
         document.execCommand('copy');
         document.body.removeChild(el);
-        if (selected) {
-            document.getSelection().removeAllRanges();
-            document.getSelection().addRange(selected);
+        if (selected && selection) {
+            selection.removeAllRanges();
+            selection.addRange(selected);
         }
     }
 }
@@ -139,6 +158,7 @@ function getRGB(str) {
 
 function removeFavourites(event) {
 
+    favouriteImages = getStoredFavourites();
     let imageUrl = window.normalizeImageUrl(
         event.currentTarget.parentElement.children[0].getAttribute("src")
     );
@@ -147,15 +167,17 @@ function removeFavourites(event) {
             event.currentTarget.classList.remove("added");
             favouriteImages.splice(i, 1);
             localStorage.setItem("imageHueUrl", JSON.stringify(favouriteImages));
+            break;
         }
     }
 
     event.currentTarget.parentElement.remove();
+    updateEmptyState();
 
 }
 
-
-
+window.onColorClick = onColorClick;
+window.removeFavourites = removeFavourites;
 
 
 
