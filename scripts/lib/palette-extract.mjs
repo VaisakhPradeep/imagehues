@@ -183,6 +183,22 @@ function selectPalette(candidates, count, minDistance, totalCount) {
     }
   }
 
+  if (selected.length < count) {
+    for (const candidate of usableCandidates) {
+      if (selected.length >= count) {
+        break;
+      }
+
+      if (selected.some((selectedCandidate) =>
+        colorDistance(candidate.rgb, selectedCandidate.rgb) < 12
+      )) {
+        continue;
+      }
+
+      selected.push(candidate);
+    }
+  }
+
   return selected.map((candidate) => candidate.rgb);
 }
 
