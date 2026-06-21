@@ -6,36 +6,41 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   title="About Image Hues – Free Color Palette Generator for Designers"
   description="Learn how Image Hues helps designers and illustrators discover natural color palettes from beautiful photos. Built in 48 hours with love."
   canonicalPath="/about/"
-  logoClass="static"
 >
-  <div class="about-wrapper">
-    <h1>Hey <span>There!</span></h1>
-    <div class="info-container">
-      <p class="story">
+  <div class="mx-auto max-w-[1200px] px-6 pt-8 pb-[50px] max-[480px]:px-4">
+    <h1 class="text-center font-sans text-[2.6rem] font-bold text-text-primary">
+      Hey <span class="text-accent">There!</span>
+    </h1>
+    <div
+      class="animate-slide-up rounded-lg bg-surface p-8 leading-6 tracking-[0.7px] shadow-card"
+    >
+      <p class="story text-center text-sm text-text-primary">
         Do you take cold showers? You should try to, it's refreshing. This site was born out of an
         idea I had during a cold shower. Often times, I use images (especially from nature) to set the
         mood and get the color scheme before I start my designs or illustrations. So when this idea
         popped up, I knew this would definitely be useful for designers and illustrators out there,
         and thus ImageHues took birth over a span of 48hrs (Yeah, both design and development :D).
       </p>
-      <p class="note">
+      <p class="note mx-5 mt-8 text-center text-sm text-text-secondary">
         All images are from <a href="https://unsplash.com/" target="_blank">unsplash.com</a>
       </p>
-      <p class="highlight">
+      <p class="highlight mx-5 mt-8 text-center text-sm text-accent">
         If you have feedbacks, wanna say hi or have an <br />awesome project to collaborate with,
         contact me using below links:
       </p>
-      <div class="icons">
-        <a href="https://twitter.com/vaisakh_pradeep" target="_blank"
-          ><img src="/images/twitter.svg" alt="twitter icon" /></a
+      <div class="icons flex items-center justify-center">
+        <a
+          href="https://twitter.com/vaisakh_pradeep"
+          target="_blank"
+          class="mx-2 mt-4 cursor-pointer"
+          ><img src="/images/twitter.svg" alt="twitter icon" class="w-8" /></a
         >
-        <a href="https://dribbble.com/vaisakhp" target="_blank"
-          ><img src="/images/dribbble.svg" alt="dribbble icon" /></a
+        <a href="https://dribbble.com/vaisakhp" target="_blank" class="mx-2 mt-4 cursor-pointer"
+          ><img src="/images/dribbble.svg" alt="dribbble icon" class="w-8" /></a
         >
       </div>
-      <div class="buymeacoffee">
-        <p class="note">And, you'll make a designer smile if you</p>
-        <link href="https://fonts.googleapis.com/css?family=Cookie" rel="stylesheet" />
+      <div class="buymeacoffee text-center">
+        <p class="note mt-4 mb-4 text-text-primary">And, you'll make a designer smile if you</p>
         <a class="bmc-button" target="_blank" href="https://www.buymeacoffee.com/pvNOGr4"
           ><img
             src="https://bmc-cdn.nyc3.digitaloceanspaces.com/BMC-button-images/BMC-btn-logo.svg"
@@ -46,41 +51,3 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     </div>
   </div>
 </BaseLayout>
-
-<style>
-  .bmc-button img {
-    width: 27px !important;
-    margin-bottom: 1px !important;
-    box-shadow: none !important;
-    border: none !important;
-    vertical-align: middle !important;
-  }
-
-  .bmc-button {
-    line-height: 36px !important;
-    height: 37px !important;
-    text-decoration: none !important;
-    display: inline-flex !important;
-    color: #ffffff !important;
-    background-color: #ff813f !important;
-    border-radius: 3px !important;
-    border: 1px solid transparent !important;
-    padding: 1px 9px !important;
-    font-size: 22px !important;
-    letter-spacing: 0.6px !important;
-    box-shadow: 0px 1px 2px rgba(190, 190, 190, 0.5) !important;
-    margin: 0 auto !important;
-    font-family: 'Cookie', cursive !important;
-    box-sizing: border-box !important;
-    transition: 0.3s all linear !important;
-  }
-
-  .bmc-button:hover,
-  .bmc-button:active,
-  .bmc-button:focus {
-    box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;
-    text-decoration: none !important;
-    opacity: 0.85 !important;
-    color: #ffffff !important;
-  }
-</style>

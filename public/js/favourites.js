@@ -26,25 +26,12 @@ loadImages();
 function createImage(index, imageProperties) {
 
     let item = document.createElement('div');
-    item.classList.add('item' + imagesSetsLoaded + '' + index, 'item');
+    item.className = 'item' + imagesSetsLoaded + '' + index + ' item group relative m-0 w-auto animate-slide-up rounded-[18px] bg-surface p-2.5 shadow-card';
     item.innerHTML = `
-                <img src="${imageProperties.url}" alt="random image"/>
-                <div class="color-panel color-panel${index}">
-                    <div class="color" onclick="onColorClick(event)">
-                        <div class="tooltip"></div>
-                    </div>
-                    <div class="color" onclick="onColorClick(event)">
-                        <div class="tooltip"></div>
-                    </div>
-                    <div class="color" onclick="onColorClick(event)">
-                        <div class="tooltip"></div>
-                    </div>
-                    <div class="color" onclick="onColorClick(event)">
-                        <div class="tooltip"></div>
-                    </div>
-                </div>
-                <div class="favourite close" onclick="removeFavourites(event)">
-                    <svg viewBox="0 0 12.012 12.01" xmlns="http://www.w3.org/2000/svg">
+                <img src="${imageProperties.url}" alt="random image" class="w-full rounded-[6px]"/>
+                ${window.getColorPanelHtml({ className: 'color-panel' + index })}
+                <div class="favourite close absolute top-2.5 right-2.5 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-surface" onclick="removeFavourites(event)">
+                    <svg class="h-3 w-3" viewBox="0 0 12.012 12.01" xmlns="http://www.w3.org/2000/svg">
                         <g transform="translate(-5.994 -5.996)">
                         <g data-name="Layer 2">
                         <path d="M13.41,12l4.3-4.29a1,1,0,1,0-1.42-1.42L12,10.59,7.71,6.29A1,1,0,0,0,6.29,7.71L10.59,12l-4.3,4.29a1,1,0,1,0,1.42,1.42L12,13.41l4.29,4.3a1,1,0,1,0,1.42-1.42Z" fill="#111" data-name="close"/>

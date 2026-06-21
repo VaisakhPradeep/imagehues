@@ -1,5 +1,6 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import tailwindcss from '@tailwindcss/vite';
 
 const site = 'https://imagehues.com';
 
@@ -14,12 +15,6 @@ export default defineConfig({
     format: 'directory',
   },
   vite: {
-    css: {
-      preprocessorOptions: {
-        scss: {
-          silenceDeprecations: ['legacy-js-api'],
-        },
-      },
-    },
+    plugins: [tailwindcss()],
   },
 });

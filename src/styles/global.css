@@ -1,0 +1,141 @@
+@import "tailwindcss";
+
+@theme {
+  /* Colors */
+  --color-text-primary: #172e3a;
+  --color-text-secondary: #979a9c;
+  --color-text-inverse: #ffffff;
+  --color-background: #f5f7f9;
+  --color-surface: #ffffff;
+  --color-border: #eaeaea;
+  --color-accent: #f86c5c;
+  --color-twitter: #00acee;
+  --color-facebook: #3b5998;
+  --color-bmc: #ff813f;
+
+  /* Typography */
+  --font-sans: "Google Sans Flex", sans-serif;
+  --font-size-base: 14px;
+  --font-size-base-sm: 13px;
+  --text-nav: 16px;
+  --text-nav--line-height: 20px;
+
+  /* Shadows */
+  --shadow-card:
+    0 6px 4px -8px rgba(0, 0, 0, 0.2),
+    0 6px 10px 0 rgba(0, 0, 0, 0.02),
+    0 22px 18px 0 rgba(0, 0, 0, 0.02),
+    0 40px 80px 0 rgba(0, 0, 0, 0.03);
+  --shadow-bmc: 0px 1px 2px rgba(190, 190, 190, 0.5);
+  --shadow-bmc-hover: 0px 1px 2px 2px rgba(190, 190, 190, 0.5);
+
+  /* Animations */
+  --animate-slide-up: slide-up 1s ease;
+  --animate-scale: scale 1.5s ease;
+}
+
+@keyframes slide-up {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@layer base {
+  html {
+    font-size: var(--font-size-base);
+  }
+
+  @media (max-width: 768px) {
+    html {
+      font-size: var(--font-size-base-sm);
+    }
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: var(--font-sans);
+    background: var(--color-background);
+  }
+}
+
+@layer components {
+  .color .tooltip {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* Tooltip text (content injected by JS) */
+  .tooltip span {
+    display: inline-block;
+    margin: 4px;
+    font-size: 1rem;
+  }
+
+  /* About page note links */
+  .note a {
+    cursor: pointer;
+    text-decoration: underline;
+    color: var(--color-text-secondary);
+  }
+
+  /* Favourite heart filled state */
+  .favourite.added svg path {
+    fill: var(--color-accent);
+  }
+
+  /* Buy me a coffee button */
+  .bmc-button {
+    line-height: 36px !important;
+    height: 37px !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    color: var(--color-text-inverse) !important;
+    background-color: var(--color-bmc) !important;
+    border-radius: 3px !important;
+    border: 1px solid transparent !important;
+    padding: 1px 9px !important;
+    font-size: 22px !important;
+    letter-spacing: 0.6px !important;
+    box-shadow: var(--shadow-bmc) !important;
+    margin: 0 auto !important;
+    font-family: var(--font-sans) !important;
+    box-sizing: border-box !important;
+    transition: 0.3s all linear !important;
+  }
+
+  .bmc-button img {
+    width: 27px !important;
+    margin-bottom: 1px !important;
+    box-shadow: none !important;
+    border: none !important;
+    vertical-align: middle !important;
+  }
+
+  .bmc-button:hover,
+  .bmc-button:active,
+  .bmc-button:focus {
+    box-shadow: var(--shadow-bmc-hover) !important;
+    text-decoration: none !important;
+    opacity: 0.85 !important;
+    color: var(--color-text-inverse) !important;
+  }
+}

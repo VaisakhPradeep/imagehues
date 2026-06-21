@@ -1,0 +1,18 @@
+---
+interface Props {
+  type?: 'button' | 'submit' | 'reset';
+  class?: string;
+}
+
+const { type = 'button', class: className = '' } = Astro.props;
+---
+
+<button
+  type={type}
+  class:list={[
+    'inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border-0 bg-text-primary px-5 py-2.5 font-sans text-sm font-medium text-text-inverse transition-opacity duration-150 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-primary',
+    className,
+  ]}
+>
+  <slot />
+</button>
