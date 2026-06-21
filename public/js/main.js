@@ -1,5 +1,5 @@
 let imagesPerLoad = 20;
-let totalImageSets = 7;
+let totalImageSets = 6;
 let totalImages = 1374;
 let imageContainer = document.querySelector(".image-container");
 let loader = document.querySelector(".loader");
@@ -9,84 +9,53 @@ let flag = true;
 let favouriteImages = [];
 let displayedImageUrls = [];
 let precomputedPalettes = {};
-let rowUrl = [];
-let continuousLoad = true;
 let scrollOffset = 70;
-let loadFromJson = true;
 
+function getStoredFavourites() {
+    if (!localStorage.getItem("imageHueUrl")) {
+        return [];
+    }
 
-//Fetch image set with api
-function fetchImage() {
-
-    // const requestUrl = `https://picsum.photos/400/300?random=${Math.ceil(Math.random() * 10000)}`;
-    const requestUrl = `https://source.unsplash.com/collection/random/400x300?sig=${Math.ceil(Math.random() * 10000)}`;
-
-    axios({
-        method: 'get',
-        url: requestUrl,
-        responseType: 'json',
-    })
-        .then(function (response) {
-            imageUrl = response.request.responseURL;
-
-            //Check image duplicate
-            let imageExists = false;
-
-            for (let i = 0; i < displayedImageUrls.length; i++) {
-                if (response.request.responseURL === displayedImageUrls[i]) {
-                    imageExists = true;
-                }
-            }
-
-            if (!imageExists) {
-
-                createImageCard(response.request.responseURL);
-
-                displayedImageUrls.push(response.request.responseURL);
-                // console.log(displayedImageUrls.length);
-                // storeUrl(displayedImageUrls);
-
-            }
-
-
-        });
-
-}
-
-
-//Fetch image urls from local json data
-function fetchImageFromJson() {
-    axios.get('./urls.json').then(function (response) {
-        displayedImageUrls = response.data[0].urls;
-        displayedImageUrls = shuffle(displayedImageUrls);
-        createImageSetFromJson();
-    });
+    try {
+        const parsed = JSON.parse(localStorage.getItem("imageHueUrl"));
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+        return [];
+    }
 }
 
 function fetchLocalImages() {
-    for (let i = 0; i < totalImages; i++) {
-        displayedImageUrls[i] = "/unsplash_images/img" + i + ".jpg";
+    const existingUrls = {};
+    const existingImages = imageContainer.querySelectorAll(".item img");
+
+    for (let i = 0; i < existingImages.length; i++) {
+        existingUrls[window.normalizeImageUrl(existingImages[i].getAttribute("src"))] = true;
     }
+
+    displayedImageUrls = [];
+    for (let i = 0; i < totalImages; i++) {
+        const imageUrl = "/unsplash_images/img" + i + ".jpg";
+        if (!existingUrls[imageUrl]) {
+            displayedImageUrls.push(imageUrl);
+        }
+    }
+
     displayedImageUrls = shuffle(displayedImageUrls);
 }
 
-
-//Load image set from local json data
 function loadImageSetFromJson() {
     createImageSetFromJson();
 }
 
-//Create image set from local json data
 function createImageSetFromJson() {
-    if (imagesSetsLoaded < totalImageSets) {
-
+    if (imagesSetsLoaded < totalImageSets && displayedImageUrls.length > 0) {
         loader.style.display = "flex";
         footer.style.display = "none";
 
         const start = imagesSetsLoaded * imagesPerLoad;
         const end = Math.min(start + imagesPerLoad, displayedImageUrls.length);
         for (let i = start; i < end; i++) {
-            createImageCard(displayedImageUrls[i]);
+            createImageCard(displayedImageUrls[i], { lazy: true });
         }
 
         imagesSetsLoaded++;
@@ -94,23 +63,15 @@ function createImageSetFromJson() {
     else {
         loader.style.display = "none";
         footer.style.display = "block";
-
     }
 }
 
-
-//Random sort array
 function shuffle(array) {
     var currentIndex = array.length, temporaryValue, randomIndex;
 
-    // While there remain elements to shuffle...
-    while (0 !== currentIndex) {
-
-        // Pick a remaining element...
+    while (currentIndex !== 0) {
         randomIndex = Math.floor(Math.random() * currentIndex);
         currentIndex -= 1;
-
-        // And swap it with the current element.
         temporaryValue = array[currentIndex];
         array[currentIndex] = array[randomIndex];
         array[randomIndex] = temporaryValue;
@@ -119,18 +80,16 @@ function shuffle(array) {
     return array;
 }
 
-
-
-//Creating image card
 function createImageCard(url, options) {
     const prepend = options && options.prepend;
+    const lazy = options && options.lazy;
     let item = document.createElement('div');
     item.className = 'item group relative m-0 w-auto animate-slide-up rounded-[18px] bg-surface p-2.5 shadow-card';
     item.innerHTML = `
-                <img src="${url}" alt="random image" class="w-full rounded-[6px]"/>
+                <img alt="Curated photo color palette" width="400" height="300" decoding="async" class="w-full rounded-[6px]"/>
                 ${window.getColorPanelHtml()}
-                <div class="favourite absolute top-2.5 right-2.5 hidden h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-surface opacity-0 transition-all duration-300 group-hover:flex group-hover:opacity-100" onclick="addRemoveFavourites(event)">
-                    <svg class="h-4 w-4" viewBox="0 0 14.231 12.094" xmlns="http://www.w3.org/2000/svg">
+                <div class="favourite absolute top-2.5 right-2.5 hidden h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-surface opacity-0 transition-all duration-300 group-hover:flex group-hover:opacity-100" onclick="addRemoveFavourites(event)" aria-label="Save palette to favourites" role="button" tabindex="0">
+                    <svg class="h-4 w-4" viewBox="0 0 14.231 12.094" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <g transform="translate(-1.999 -4)">
                         <g transform="translate(1.999 4)" data-name="Layer 2">
                         <path transform="translate(-1.999 -4)" d="M9.114,16.095a.711.711,0,0,1-.505-.206L3.081,10.353A3.723,3.723,0,1,1,8.346,5.089l.768.768.768-.768a3.723,3.723,0,1,1,5.265,5.265L9.619,15.888A.711.711,0,0,1,9.114,16.095ZM5.713,5.423a2.277,2.277,0,0,0-1.622.669,2.305,2.305,0,0,0,0,3.251l5.023,5.03,5.023-5.03a2.305,2.305,0,0,0,0-3.251,2.362,2.362,0,0,0-3.244,0L9.619,7.372a.711.711,0,0,1-1.01,0L7.335,6.092a2.277,2.277,0,0,0-1.622-.669Z" fill="#202428"/>
@@ -138,49 +97,35 @@ function createImageCard(url, options) {
                         </g>
                     </svg>
                 </div>
-            `
+            `;
 
     let img = item.children[0];
     img.setAttribute("crossorigin", "anonymous");
+    if (lazy) {
+        img.setAttribute("loading", "lazy");
+    }
     img.addEventListener('load', function () {
         findColors(item);
-        if (prepend) {
-            imageContainer.prepend(item);
-        } else {
-            imageContainer.appendChild(item);
-        }
         loadFavourites(item);
     });
-    
-
-}
-
-
-//Load Images
-function loadImageSet() {
-
-    imagesSetsLoaded++;
-
-    if (imagesSetsLoaded < totalImageSets) {
-
-        loader.style.display = "flex";
-        footer.style.display = "none";
-
-        for (let i = 0; i < imagesPerLoad; i++) {
-            fetchImage();
+    img.addEventListener('error', function () {
+        if (loader) {
+            loader.style.display = "none";
         }
-
+    });
+    if (prepend) {
+        imageContainer.prepend(item);
+    } else {
+        imageContainer.appendChild(item);
     }
-    else {
-        loader.style.display = "none";
-        footer.style.display = "block";
-    }
-
+    img.src = url;
 }
 
-
-//Find image color palette
 function fillPalette(colors, colorElements) {
+    if (!colors || colors.length < colorElements.length) {
+        return;
+    }
+
     for (let i = 0; i < colorElements.length; i++) {
         const color = colorElements[i];
         color.style.backgroundColor = `rgb(${colors[i][0]}, ${colors[i][1]}, ${colors[i][2]})`;
@@ -206,19 +151,18 @@ function findColors(item) {
     fillPalette(getPaletteFromImage(img), colorElements);
 }
 
-
-
-//Copy color to clipboard on click
 function onColorClick(e) {
-    let rgbColor = getRGB(e.target.style.backgroundColor);
-    let red = rgbColor.red;
-    let green = rgbColor.green;
-    let blue = rgbColor.blue;
-    let hexColor = rgbToHex(red, green, blue);
+    const colorElement = e.currentTarget;
+    let rgbColor = getRGB(colorElement.style.backgroundColor);
+    if (!rgbColor.red) {
+        return;
+    }
+
+    let hexColor = rgbToHex(rgbColor.red, rgbColor.green, rgbColor.blue);
     copyToClipboard(hexColor);
-    e.target.children[0].innerHTML = "<span>Copied</span>";
+    colorElement.children[0].innerHTML = "<span>Copied</span>";
     setTimeout(() => {
-        e.target.children[0].innerHTML = "<span>" + hexColor + "</span>";
+        colorElement.children[0].innerHTML = "<span>" + hexColor + "</span>";
     }, 2000);
 }
 
@@ -233,7 +177,9 @@ function getRGB(str) {
 
 function copyToClipboard(str) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(str).catch(fallbackCopyToClipboard);
+        navigator.clipboard.writeText(str).catch(function () {
+            fallbackCopyToClipboard(str);
+        });
         return;
     }
     fallbackCopyToClipboard(str);
@@ -246,42 +192,31 @@ function fallbackCopyToClipboard(str) {
     el.style.position = 'absolute';
     el.style.left = '-9999px';
     document.body.appendChild(el);
-    const selected =
-        document.getSelection().rangeCount > 0 ? document.getSelection().getRangeAt(0) : false;
+    const selection = document.getSelection();
+    const selected = selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : false;
     el.select();
     document.execCommand('copy');
     document.body.removeChild(el);
-    if (selected) {
-        document.getSelection().removeAllRanges();
-        document.getSelection().addRange(selected);
+    if (selected && selection) {
+        selection.removeAllRanges();
+        selection.addRange(selected);
     }
 }
 
-
-//convert particular r,g or b value to its corresponding hex value
 function convertToHex(rgb) {
     let hex = Number(rgb).toString(16);
     if (hex.length < 2) {
         hex = "0" + hex;
     }
     return hex;
-};
+}
 
-
-//convert rgb value to hex value
 function rgbToHex(r, g, b) {
-    let red = convertToHex(r);
-    let green = convertToHex(g);
-    let blue = convertToHex(b);
-    return '#' + red + green + blue;
-};
+    return '#' + convertToHex(r) + convertToHex(g) + convertToHex(b);
+}
 
-
-//add or remove to/from favourites
 function addRemoveFavourites(event) {
-    if (localStorage.getItem("imageHueUrl")) {
-        favouriteImages = JSON.parse(localStorage.getItem("imageHueUrl"));
-    }
+    favouriteImages = getStoredFavourites();
     let imageUrl = window.normalizeImageUrl(
         event.currentTarget.parentElement.children[0].getAttribute("src")
     );
@@ -307,72 +242,41 @@ function addRemoveFavourites(event) {
     localStorage.setItem("imageHueUrl", JSON.stringify(favouriteImages));
 }
 
-
-//set image as favourite if the image displayed has already been added to favourites
 function loadFavourites(item) {
-    const imageUrl = window.normalizeImageUrl(item.children[0].getAttribute("src"));
-    if (localStorage.getItem("imageHueUrl")) {
-        favouriteImages = JSON.parse(localStorage.getItem("imageHueUrl"));
+    const favouriteButton = item.querySelector(".favourite");
+    if (!favouriteButton) {
+        return;
     }
+
+    const imageUrl = window.normalizeImageUrl(item.children[0].getAttribute("src"));
+    favouriteImages = getStoredFavourites();
+    favouriteButton.classList.remove("added");
     for (let i = 0; i < favouriteImages.length; i++) {
         if (window.imageUrlsMatch(imageUrl, favouriteImages[i].url)) {
-            item.querySelector(".favourite").classList.add("added");
+            favouriteButton.classList.add("added");
+            return;
         }
     }
 }
 
+function hydrateServerRenderedCards() {
+    const serverCards = imageContainer.querySelectorAll(".item");
+    for (let i = 0; i < serverCards.length; i++) {
+        loadFavourites(serverCards[i]);
+    }
+}
 
-//Load more images when scroll reaches bottom
 window.addEventListener("scroll", () => {
     if (Math.ceil(window.innerHeight + document.documentElement.scrollTop) >= document.body.offsetHeight - scrollOffset) {
-
-        if (continuousLoad && !loadFromJson) {
-            setTimeout(() => {
-
-                if (loadFromJson) {
-                    loadImageSetFromJson();
-                }
-                else {
-                    loadImageSet();
-                }
-
-            }, 500);
+        if (flag) {
+            setTimeout(loadImageSetFromJson, 500);
         }
-        else {
-            if (flag) {
-
-                if (loadFromJson) {
-                    setTimeout(() => {
-                        loadImageSetFromJson();
-                    }, 500);
-                }
-                else {
-                    setTimeout(() => {
-                        loadImageSet();
-                    }, 500);
-                }
-
-            }
-            flag = false;
-        }
+        flag = false;
     }
     else {
         flag = true;
     }
-
 });
-
-
-
-function storeUrl(urls) {
-    localStorage.setItem("storedUrls", JSON.stringify(urls));
-}
-
-
-// for (let i = 0; i < 1000; i++){
-//     fetchImage();
-// }
-
 
 function loadPrecomputedPalettes() {
     return fetch('/data/palettes.json')
@@ -391,13 +295,8 @@ function loadPrecomputedPalettes() {
 }
 
 function startApp() {
-    if (loadFromJson) {
-        fetchLocalImages();
-        loadImageSetFromJson();
-    }
-    else {
-        loadImageSet();
-    }
+    hydrateServerRenderedCards();
+    fetchLocalImages();
 }
 
 function initImageUpload() {
@@ -490,11 +389,10 @@ function initImageUpload() {
     });
 }
 
+window.onColorClick = onColorClick;
+window.addRemoveFavourites = addRemoveFavourites;
+
 loadPrecomputedPalettes().finally(function () {
     startApp();
     initImageUpload();
 });
-
-
-
-

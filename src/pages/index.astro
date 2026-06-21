@@ -2,18 +2,25 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Loader from "../components/Loader.astro";
 import UploadSection from "../components/UploadSection.astro";
+import palettes from "../../public/data/palettes.json";
 
 const scripts = ["/js/axios.min.js", "/js/palette-extract.js", "/js/main.js"];
+const initialPaletteEntries = Object.entries(palettes).slice(0, 20);
+
+function rgbToCss(rgb: number[]) {
+  return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+}
 ---
 
 <BaseLayout
   title="Image Hues – Color Palettes from Beautiful Photos"
   description="Discover natural, fresh color palettes extracted from beautiful images. Click any swatch to copy its hex code. A free tool for designers and illustrators."
   canonicalPath="/"
+  includeUrlMap={true}
   scripts={scripts}
 >
   <div class="mx-auto max-w-[1200px] px-6 max-[480px]:px-4">
-    <div class="hero grid grid-cols-2 items-center py-24 gap-8">
+    <div class="hero grid grid-cols-2 items-center gap-8 py-24 max-lg:grid-cols-1 max-lg:py-16">
       <h1
         class="mb-0 font-sans text-[48px] leading-[56px] font-medium text-text-primary max-md:text-[36px] max-md:leading-[44px] max-[480px]:text-[28px] max-[480px]:leading-[36px]"
       >
@@ -23,8 +30,55 @@ const scripts = ["/js/axios.min.js", "/js/palette-extract.js", "/js/main.js"];
     </div>
 
     <div
-      class="image-container mx-auto grid max-w-none grid-cols-4 gap-6 py-[50px] max-md:grid-cols-2 max-[480px]:grid-cols-1 max-[480px]:px-4"
+      class="image-container mx-auto grid max-w-none grid-cols-4 gap-6 py-[50px] max-md:grid-cols-2 max-[480px]:!grid-cols-1 max-[480px]:px-4"
     >
+      {
+        initialPaletteEntries.map(([imageUrl, colors]) => (
+          <div
+            class="item group relative m-0 w-auto animate-slide-up rounded-[18px] bg-surface p-2.5 shadow-card"
+            data-server-rendered="true"
+          >
+            <img
+              src={imageUrl}
+              alt="Curated photo color palette"
+              width="400"
+              height="300"
+              loading="eager"
+              decoding="async"
+              crossorigin="anonymous"
+              class="w-full rounded-[6px]"
+            />
+            <div class="color-panel flex items-center justify-between px-[30px] py-4 max-[480px]:p-4">
+              {colors.map((color) => (
+                <div
+                  class="color group/color relative h-6 w-6 animate-scale cursor-pointer rounded-full bg-background max-[480px]:h-[20px] max-[480px]:w-[20px]"
+                  style={`background-color: ${rgbToCss(color.rgb)}`}
+                  onclick="onColorClick(event)"
+                >
+                  <div class="tooltip absolute -bottom-[35px] z-[100] hidden rounded bg-text-primary text-text-inverse group-hover/color:block">
+                    <span>{color.hex}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div
+              class="favourite absolute top-2.5 right-2.5 hidden h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-surface opacity-0 transition-all duration-300 group-hover:flex group-hover:opacity-100"
+              onclick="addRemoveFavourites(event)"
+              aria-label="Save palette to favourites"
+              role="button"
+              tabindex="0"
+            >
+              <svg class="h-4 w-4" viewBox="0 0 14.231 12.094" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <g transform="translate(-1.999 -4)">
+                  <g transform="translate(1.999 4)" data-name="Layer 2">
+                    <path transform="translate(-1.999 -4)" d="M9.114,16.095a.711.711,0,0,1-.505-.206L3.081,10.353A3.723,3.723,0,1,1,8.346,5.089l.768.768.768-.768a3.723,3.723,0,1,1,5.265,5.265L9.619,15.888A.711.711,0,0,1,9.114,16.095ZM5.713,5.423a2.277,2.277,0,0,0-1.622.669,2.305,2.305,0,0,0,0,3.251l5.023,5.03,5.023-5.03a2.305,2.305,0,0,0,0-3.251,2.362,2.362,0,0,0-3.244,0L9.619,7.372a.711.711,0,0,1-1.01,0L7.335,6.092a2.277,2.277,0,0,0-1.622-.669Z" fill="#202428"></path>
+                  </g>
+                </g>
+              </svg>
+            </div>
+          </div>
+        ))
+      }
     </div>
 
     <Loader />
@@ -34,6 +88,7 @@ const scripts = ["/js/axios.min.js", "/js/palette-extract.js", "/js/main.js"];
         Refresh to find new palettes, but do remember <a
           href="https://en.wikipedia.org/wiki/Hick%27s_law"
           target="_blank"
+          rel="noopener noreferrer"
           class="cursor-pointer text-text-secondary underline">Hick's law</a
         >
       </h4>
