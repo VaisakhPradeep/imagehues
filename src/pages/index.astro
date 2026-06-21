@@ -4,7 +4,7 @@ import Loader from "../components/Loader.astro";
 import UploadSection from "../components/UploadSection.astro";
 import palettes from "../../public/data/palettes.json";
 
-const scripts = ["/js/color-thief.min.js", "/js/main.js"];
+const scripts = ["/js/axios.min.js", "/js/palette-extract.js", "/js/main.js"];
 const initialPaletteEntries = Object.entries(palettes).slice(0, 20);
 
 function rgbToCss(rgb: number[]) {

@@ -78,6 +78,11 @@
 }
 
 @layer components {
+  .color {
+    box-sizing: border-box;
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-surface), var(--color-text-primary) 8%);
+  }
+
   .color .tooltip {
     left: 50%;
     transform: translateX(-50%);

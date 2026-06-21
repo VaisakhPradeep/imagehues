@@ -4,7 +4,7 @@
   "version": "2.0.0",
   "private": true,
   "engines": {
-    "node": ">=20.3.0"
+    "node": "^20.19.5 || >=22.0.0"
   },
   "scripts": {
     "dev": "astro dev",
@@ -19,6 +19,7 @@
     "tailwindcss": "^4.3.1"
   },
   "devDependencies": {
-    "colorthief": "^2.6.0"
+    "colorthief": "^2.6.0",
+    "sharp": "^0.34.2"
   }
 }
