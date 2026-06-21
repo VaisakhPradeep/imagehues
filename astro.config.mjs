@@ -6,11 +6,7 @@ const site = 'https://imagehues.com';
 
 export default defineConfig({
   site,
-  integrations: [
-    sitemap({
-      filter: (page) => !page.includes('/about.html') && !page.includes('/favourites.html'),
-    }),
-  ],
+  integrations: [sitemap()],
   build: {
     format: 'directory',
   },
