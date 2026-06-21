@@ -1,0 +1,20 @@
+---
+import ColorSwatch from "./ColorSwatch.astro";
+
+interface Props {
+  id?: string;
+  class?: string;
+}
+
+const { id, class: className = "" } = Astro.props;
+---
+
+<div
+  id={id}
+  class:list={["color-panel flex items-center gap-3 py-4", className]}
+>
+  <ColorSwatch />
+  <ColorSwatch />
+  <ColorSwatch />
+  <ColorSwatch />
+</div>

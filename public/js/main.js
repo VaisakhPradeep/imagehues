@@ -122,27 +122,15 @@ function shuffle(array) {
 
 
 //Creating image card
-function createImageCard(url) {
+function createImageCard(url, options) {
+    const prepend = options && options.prepend;
     let item = document.createElement('div');
-    item.classList.add('item');
+    item.className = 'item group relative m-0 w-auto animate-slide-up rounded-[18px] bg-surface p-2.5 shadow-card';
     item.innerHTML = `
-                <img src="${url}" alt="random image"/>
-                <div class="color-panel">
-                    <div class="color" onclick="onColorClick(event)">
-                        <div class="tooltip"></div>
-                    </div>
-                    <div class="color" onclick="onColorClick(event)">
-                        <div class="tooltip"></div>
-                    </div>
-                    <div class="color" onclick="onColorClick(event)">
-                        <div class="tooltip"></div>
-                    </div>
-                    <div class="color" onclick="onColorClick(event)">
-                        <div class="tooltip"></div>
-                    </div>
-                </div>
-                <div class="favourite" onclick="addRemoveFavourites(event)">
-                    <svg viewBox="0 0 14.231 12.094" xmlns="http://www.w3.org/2000/svg">
+                <img src="${url}" alt="random image" class="w-full rounded-[6px]"/>
+                ${window.getColorPanelHtml()}
+                <div class="favourite absolute top-2.5 right-2.5 hidden h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-surface opacity-0 transition-all duration-300 group-hover:flex group-hover:opacity-100" onclick="addRemoveFavourites(event)">
+                    <svg class="h-4 w-4" viewBox="0 0 14.231 12.094" xmlns="http://www.w3.org/2000/svg">
                         <g transform="translate(-1.999 -4)">
                         <g transform="translate(1.999 4)" data-name="Layer 2">
                         <path transform="translate(-1.999 -4)" d="M9.114,16.095a.711.711,0,0,1-.505-.206L3.081,10.353A3.723,3.723,0,1,1,8.346,5.089l.768.768.768-.768a3.723,3.723,0,1,1,5.265,5.265L9.619,15.888A.711.711,0,0,1,9.114,16.095ZM5.713,5.423a2.277,2.277,0,0,0-1.622.669,2.305,2.305,0,0,0,0,3.251l5.023,5.03,5.023-5.03a2.305,2.305,0,0,0,0-3.251,2.362,2.362,0,0,0-3.244,0L9.619,7.372a.711.711,0,0,1-1.01,0L7.335,6.092a2.277,2.277,0,0,0-1.622-.669Z" fill="#202428"/>
@@ -156,7 +144,11 @@ function createImageCard(url) {
     img.setAttribute("crossorigin", "anonymous");
     img.addEventListener('load', function () {
         findColors(item);
-        imageContainer.appendChild(item);
+        if (prepend) {
+            imageContainer.prepend(item);
+        } else {
+            imageContainer.appendChild(item);
+        }
         loadFavourites(item);
     });
     
@@ -188,37 +180,31 @@ function loadImageSet() {
 
 
 //Find image color palette
-function findColors(item) {
+function fillPalette(colors, colorElements) {
+    for (let i = 0; i < colorElements.length; i++) {
+        const color = colorElements[i];
+        color.style.backgroundColor = `rgb(${colors[i][0]}, ${colors[i][1]}, ${colors[i][2]})`;
+        color.children[0].innerHTML = "<span>" + rgbToHex(colors[i][0], colors[i][1], colors[i][2]) + "</span>";
+    }
+}
 
-    const img = item.children[0];
-    const color1 = img.nextElementSibling.children[0];
-    const color2 = img.nextElementSibling.children[1];
-    const color3 = img.nextElementSibling.children[2];
-    const color4 = img.nextElementSibling.children[3];
+function getPaletteFromImage(img) {
     const imageUrl = window.normalizeImageUrl(img.getAttribute('src'));
     const cached = precomputedPalettes[imageUrl];
 
     if (cached && cached.length >= 4) {
-        fillColor(cached.map(function (entry) { return entry.rgb; }));
-        return;
+        return cached.map(function (entry) { return entry.rgb; });
     }
 
     const colorThief = new ColorThief();
-    fillColor(colorThief.getPalette(img, 4, 5));
+    return colorThief.getPalette(img, 4, 5);
+}
 
-    function fillColor(colors) {
-        color1.style.backgroundColor = `rgb(${colors[0][0]}, ${colors[0][1]}, ${colors[0][2]})`;
-        color2.style.backgroundColor = `rgb(${colors[1][0]}, ${colors[1][1]}, ${colors[1][2]})`;
-        color3.style.backgroundColor = `rgb(${colors[2][0]}, ${colors[2][1]}, ${colors[2][2]})`;
-        color4.style.backgroundColor = `rgb(${colors[3][0]}, ${colors[3][1]}, ${colors[3][2]})`;
-
-        color1.children[0].innerHTML = "<span>" + rgbToHex(colors[0][0], colors[0][1], colors[0][2]) + "</span>";
-        color2.children[0].innerHTML = "<span>" + rgbToHex(colors[1][0], colors[1][1], colors[1][2]) + "</span>";
-        color3.children[0].innerHTML = "<span>" + rgbToHex(colors[2][0], colors[2][1], colors[2][2]) + "</span>";
-        color4.children[0].innerHTML = "<span>" + rgbToHex(colors[3][0], colors[3][1], colors[3][2]) + "</span>";
-
-    }
-
+function findColors(item) {
+    const img = item.children[0];
+    const colorPanel = img.nextElementSibling;
+    const colorElements = colorPanel.children;
+    fillPalette(getPaletteFromImage(img), colorElements);
 }
 
 
@@ -375,15 +361,6 @@ window.addEventListener("scroll", () => {
         flag = true;
     }
 
-    let logoContainer = document.getElementById("logo");
-
-    if(window.scrollY > imageContainer.offsetTop && window.innerWidth > 480){
-        logoContainer.children[1].className = "show";
-    }
-    else{
-        logoContainer.children[1].className = "";
-    }
-
 });
 
 
@@ -424,7 +401,100 @@ function startApp() {
     }
 }
 
-loadPrecomputedPalettes().finally(startApp);
+function initImageUpload() {
+    const input = document.getElementById('image-upload');
+    const dropzone = document.getElementById('upload-dropzone');
+    const initialState = document.getElementById('upload-initial');
+    const resultState = document.getElementById('upload-result');
+    const previewImg = document.getElementById('upload-preview-img');
+    const colorPanel = document.getElementById('upload-color-panel');
+
+    if (!input || !dropzone || !initialState || !resultState || !previewImg || !colorPanel) {
+        return;
+    }
+
+    const colorElements = colorPanel.querySelectorAll('.color');
+    let currentUploadUrl = null;
+    let dragCounter = 0;
+
+    function lockUploadSectionHeight() {
+        dropzone.style.minHeight = dropzone.offsetHeight + 'px';
+    }
+
+    const initialImage = initialState.querySelector('img');
+    if (initialImage.complete) {
+        lockUploadSectionHeight();
+    } else {
+        initialImage.addEventListener('load', lockUploadSectionHeight);
+    }
+    window.addEventListener('load', lockUploadSectionHeight);
+    window.addEventListener('resize', function () {
+        if (!initialState.classList.contains('hidden')) {
+            lockUploadSectionHeight();
+        }
+    });
+
+    function showUploadResult(url) {
+        if (currentUploadUrl) {
+            URL.revokeObjectURL(currentUploadUrl);
+        }
+        currentUploadUrl = url;
+        previewImg.src = url;
+
+        previewImg.onload = function () {
+            fillPalette(getPaletteFromImage(previewImg), colorElements);
+            initialState.classList.add('hidden');
+            resultState.classList.remove('hidden');
+        };
+    }
+
+    function handleImageFile(file) {
+        if (!file || !file.type.startsWith('image/')) {
+            return;
+        }
+
+        showUploadResult(URL.createObjectURL(file));
+        input.value = '';
+    }
+
+    input.addEventListener('change', function (event) {
+        const file = event.target.files && event.target.files[0];
+        handleImageFile(file);
+    });
+
+    dropzone.addEventListener('dragenter', function (event) {
+        event.preventDefault();
+        dragCounter++;
+        dropzone.classList.add('upload-section--dragover');
+    });
+
+    dropzone.addEventListener('dragover', function (event) {
+        event.preventDefault();
+    });
+
+    dropzone.addEventListener('dragleave', function (event) {
+        event.preventDefault();
+        dragCounter--;
+        if (dragCounter <= 0) {
+            dragCounter = 0;
+            dropzone.classList.remove('upload-section--dragover');
+        }
+    });
+
+    dropzone.addEventListener('drop', function (event) {
+        event.preventDefault();
+        dragCounter = 0;
+        dropzone.classList.remove('upload-section--dragover');
+
+        const file = event.dataTransfer.files && event.dataTransfer.files[0];
+        handleImageFile(file);
+    });
+}
+
+loadPrecomputedPalettes().finally(function () {
+    startApp();
+    initImageUpload();
+});
 
 
 

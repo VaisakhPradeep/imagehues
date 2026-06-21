@@ -3,7 +3,6 @@ export interface Props {
   title: string;
   description: string;
   canonicalPath: string;
-  logoClass?: string;
   scripts?: string[];
 }
 
@@ -11,9 +10,9 @@ const site = 'https://imagehues.com';
 const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
 const legacyGaId = 'UA-120902603-2';
 
-const { title, description, canonicalPath, logoClass = '', scripts = [] } = Astro.props;
+const { title, description, canonicalPath, scripts = [] } = Astro.props;
 const canonical = `${site}${canonicalPath}`;
-const ogImage = `${site}/images/logo.png`;
+const ogImage = `${site}/images/OG_Image.png`;
 ---
 
 <!DOCTYPE html>
@@ -33,16 +32,14 @@ const ogImage = `${site}/images/logo.png`;
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
-    <link rel="shortcut icon" href="/images/logo.png" type="image" sizes="16x16" />
-    <link rel="apple-touch-icon" sizes="114x114" href="/images/logo.png" />
-    <link rel="apple-touch-icon" sizes="72x72" href="/images/logo.png" />
-    <link rel="apple-touch-icon" href="/images/logo.png" />
+    <link rel="icon" href="/images/favicon/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png" />
+    <link rel="apple-touch-icon" href="/images/favicon/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/images/favicon/android-chrome-192x192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/images/favicon/android-chrome-512x512.png" />
     <link
-      href="https://fonts.googleapis.com/css?family=Open+Sans:400,600&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css?family=Montserrat:700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@100..900&display=swap"
       rel="stylesheet"
     />
     {
@@ -64,28 +61,54 @@ const ogImage = `${site}/images/logo.png`;
     </script>
   </head>
   <body>
-    <div class="page-wrapper">
-      <nav class="top-navigation">
-        <a id="logo" href="/">
-          <img src="/images/logo.svg" alt="Image Hues logo" />
-          <h4 class={logoClass}>Image<span>Hues</span></h4>
+    <div class="bg-background">
+      <nav
+        class="fixed top-0 left-0 right-0 z-[200] flex h-[50px] items-center justify-between border-b border-border bg-surface px-6 max-[480px]:px-4"
+      >
+        <a id="logo" href="/" class="flex cursor-pointer items-center no-underline">
+          <img
+            src="/images/imagehues_logo.svg"
+            alt="Image Hues"
+            class="h-[25px] w-auto max-[480px]:h-[20px]"
+          />
         </a>
-        <ul id="nav-items">
-          <li><a href="/" class="home">Home</a></li>
-          <li><a href="/favourites/" class="favourites">Favourites</a></li>
-          <li><a href="/about/" class="about">About</a></li>
+        <ul id="nav-items" class="flex shrink-0 list-none items-center">
+          <li>
+            <a
+              href="/"
+              class="home text-nav mx-4 font-medium text-text-secondary no-underline transition-colors duration-100 hover:opacity-80 max-[480px]:mx-2 [&.active]:text-text-primary"
+              >Home</a
+            >
+          </li>
+          <li>
+            <a
+              href="/favourites/"
+              class="favourites text-nav mx-4 font-medium text-text-secondary no-underline transition-colors duration-100 hover:opacity-80 max-[480px]:mx-2 [&.active]:text-text-primary"
+              >Favourites</a
+            >
+          </li>
+          <li>
+            <a
+              href="/about/"
+              class="about text-nav mx-4 font-medium text-text-secondary no-underline transition-colors duration-100 hover:opacity-80 max-[480px]:mx-2 [&.active]:text-text-primary"
+              >About</a
+            >
+          </li>
         </ul>
       </nav>
-      <slot />
+      <main class="pt-[50px]">
+        <slot />
+      </main>
     </div>
     <slot name="after-wrapper" />
     <script is:inline src="/js/url-map.js"></script>
     <script is:inline src="/js/migrate.js"></script>
+    <script is:inline src="/js/color-panel.js"></script>
     {scripts.map((script) => <script is:inline src={script}></script>)}
     <script is:inline src="/js/common.js"></script>
   </body>
 </html>
 
-<style is:global lang="scss">
-  @import '../styles/style.sass';
+<style is:global>
+  @import '../styles/global.css';
 </style>

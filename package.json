@@ -11,10 +11,11 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.4.0",
-    "astro": "^5.7.0"
+    "@tailwindcss/vite": "^4.3.1",
+    "astro": "^5.7.0",
+    "tailwindcss": "^4.3.1"
   },
   "devDependencies": {
-    "colorthief": "^2.6.0",
-    "sass": "^1.86.3"
+    "colorthief": "^2.6.0"
   }
 }

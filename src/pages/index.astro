@@ -1,7 +1,9 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Loader from "../components/Loader.astro";
+import UploadSection from "../components/UploadSection.astro";
 
-const scripts = ['/js/axios.min.js', '/js/color-thief.min.js', '/js/main.js'];
+const scripts = ["/js/axios.min.js", "/js/color-thief.min.js", "/js/main.js"];
 ---
 
 <BaseLayout
@@ -10,98 +12,31 @@ const scripts = ['/js/axios.min.js', '/js/color-thief.min.js', '/js/main.js'];
   canonicalPath="/"
   scripts={scripts}
 >
-  <div class="header-container">
-    <div class="heading">
-      <h1>Image<span>Hues</span></h1>
-      <div class="social-media">
-        <span>Share on</span>
-        <a
-          href="https://twitter.com/share?text=ImageHues! An awesome website for fresh and natural color palettes from beautiful images. Made by @vaisakh_pradeep&url=https://imagehues.com"
-          target="_blank"
-          class="twitter"
-          title="twitter"
-          ><img src="/images/twitter.svg" alt="Share on Twitter" />
-        </a>
-        <a
-          href="https://www.facebook.com/share.php?u=https://imagehues.com&title=ImageHues! An awesome website for fresh and natural color palettes from images."
-          target="_blank"
-          class="fb"
-          title="facebook"
-          ><img src="/images/fb.svg" alt="Share on Facebook" /></a
-        >
-      </div>
-      <a
-        href="https://www.producthunt.com/posts/imagehues?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-imagehues"
-        target="_blank"
-        class="product-hunt"
+  <div class="mx-auto max-w-[1200px] px-6 max-[480px]:px-4">
+    <div class="hero grid grid-cols-2 items-center py-24 gap-8">
+      <h1
+        class="mb-0 font-sans text-[48px] leading-[56px] font-medium text-text-primary max-md:text-[36px] max-md:leading-[44px] max-[480px]:text-[28px] max-[480px]:leading-[36px]"
       >
-        <img
-          src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=170405&theme=light"
-          alt="ImageHues - Natural, fresh color palettes from random beautiful images | Product Hunt Embed"
-          style="width: 250px; height: 40px;"
-          width="250"
-          height="40"
-        />
-      </a>
+        Beautiful colour palettes from curated images
+      </h1>
+      <UploadSection />
     </div>
-    <h3>Natural, fresh color palettes from random beautiful images.</h3>
-    <div class="additional-info">
-      <h4>Click on the colour to copy. Made with &#x2764; by vaisakh pradeep</h4>
-      <a href="https://twitter.com/vaisakh_pradeep" target="_blank"
-        ><img src="/images/twitter.svg" alt="twitter icon" /></a
-      >
-      <a href="https://dribbble.com/vaisakhp" target="_blank"
-        ><img src="/images/dribbble.svg" alt="dribbble icon" /></a
-      >
-    </div>
-  </div>
 
-  <div class="image-container"></div>
-
-  <div class="loader">
-    <svg
-      version="1.1"
-      id="L4"
-      xmlns="http://www.w3.org/2000/svg"
-      xmlns:xlink="http://www.w3.org/1999/xlink"
-      x="0px"
-      y="0px"
-      viewBox="0 0 100 100"
-      enable-background="new 0 0 0 0"
-      xml:space="preserve"
+    <div
+      class="image-container mx-auto grid max-w-none grid-cols-4 gap-6 py-[50px] max-md:grid-cols-2 max-[480px]:grid-cols-1 max-[480px]:px-4"
     >
-      <circle fill="#ccc" stroke="none" cx="6" cy="50" r="6">
-        <animate
-          attributeName="opacity"
-          dur="1s"
-          values="0;1;0"
-          repeatCount="indefinite"
-          begin="0.1"></animate>
-      </circle>
-      <circle fill="#ccc" stroke="none" cx="26" cy="50" r="6">
-        <animate
-          attributeName="opacity"
-          dur="1s"
-          values="0;1;0"
-          repeatCount="indefinite"
-          begin="0.2"></animate>
-      </circle>
-      <circle fill="#ccc" stroke="none" cx="46" cy="50" r="6">
-        <animate
-          attributeName="opacity"
-          dur="1s"
-          values="0;1;0"
-          repeatCount="indefinite"
-          begin="0.3"></animate>
-      </circle>
-    </svg>
-  </div>
+    </div>
 
-  <footer slot="after-wrapper">
-    <h4>
-      Refresh to find new palettes, but do remember <a
-        href="https://en.wikipedia.org/wiki/Hick%27s_law"
-        target="_blank">Hick's law</a>
-    </h4>
-  </footer>
+    <Loader />
+
+    <footer slot="after-wrapper" class="hidden">
+      <h4 class="text-center text-sm font-normal text-text-secondary">
+        Refresh to find new palettes, but do remember <a
+          href="https://en.wikipedia.org/wiki/Hick%27s_law"
+          target="_blank"
+          class="cursor-pointer text-text-secondary underline">Hick's law</a
+        >
+      </h4>
+    </footer>
+  </div>
 </BaseLayout>

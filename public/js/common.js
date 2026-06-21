@@ -25,17 +25,19 @@ window.imageUrlsMatch = function (a, b) {
 };
 
 (function () {
-    var nav = document.getElementById('nav-items'),
-        link = nav.getElementsByTagName('li'),
-        parts = window.location.pathname.replace(/\/$/, '').split('/'),
-        current = parts[parts.length - 1] || 'home';
-    if (current === 'home' || current === 'index.html') {
-        link[0].className = "active";
-        return;
-    }
-    for (var i = 0; i < link.length; i++) {
-        if (link[i].children[0].className === current) {
-            link[i].className = "active";
+    var nav = document.getElementById('nav-items');
+    if (!nav) return;
+
+    var links = nav.getElementsByTagName('a');
+    var path = window.location.pathname.replace(/\/index\.html$/, '/').replace(/\/+$/, '') || '/';
+
+    for (var i = 0; i < links.length; i++) {
+        var href = links[i].getAttribute('href');
+        if (!href) continue;
+
+        var linkPath = href.replace(/\/index\.html$/, '/').replace(/\/+$/, '') || '/';
+        if (path === linkPath) {
+            links[i].classList.add('active');
         }
     }
 })();
