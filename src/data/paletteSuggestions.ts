@@ -3,6 +3,7 @@
 // 
 // Progress: Batch 1 - Images 0-99 completed
 //           Batch 2 - Images 100-149 completed
+//           Batch 3 - Images 150-199 completed
 // 
 // KEY FINDINGS about this dataset:
 // - MAJORITY are NOT nature/landscape scenes (est. 85-90%)
@@ -49,6 +50,8 @@ export const PALETTE_SUGGESTIONS: Record<string, string[]> = {
   "107": ["Canyon"],
   "119": ["Dusk", "Mountain"],
   "143": ["Autumn"],
+  "159": ["Mountain"],
+  "180": ["Mountain", "Fog"],
   "400": ["Aurora", "Desert"],
   "1000": ["Desert"]
 };
