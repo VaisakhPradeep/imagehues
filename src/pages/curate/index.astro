@@ -1,0 +1,690 @@
+---
+import palettes from "../../../public/data/palettes.json";
+
+const allPalettes = Object.keys(palettes).map((imageUrl) => {
+  const match = imageUrl.match(/img(\d+)\.jpg$/);
+  if (!match) return null;
+  
+  return {
+    id: match[1],
+    imageUrl,
+    colors: palettes[imageUrl],
+  };
+}).filter(Boolean);
+
+function rgbToCss(rgb: number[]) {
+  return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+}
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Palette Curator – Internal Tool</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #f5f5f5;
+        color: #1a1a1a;
+        line-height: 1.5;
+      }
+      
+      .header {
+        background: white;
+        border-bottom: 1px solid #e0e0e0;
+        padding: 1rem 2rem;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      }
+      
+      .header h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+      
+      .header-controls {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      
+      .filter-group {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      
+      .filter-group label {
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+      
+      .category-filter {
+        padding: 0.5rem 1rem;
+        border: 1px solid #d0d0d0;
+        border-radius: 6px;
+        background: white;
+        cursor: pointer;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+      }
+      
+      .category-filter:hover {
+        background: #f0f0f0;
+      }
+      
+      .category-filter.active {
+        background: #2563eb;
+        color: white;
+        border-color: #2563eb;
+      }
+      
+      .btn {
+        padding: 0.5rem 1rem;
+        border: 1px solid #d0d0d0;
+        border-radius: 6px;
+        background: white;
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.2s;
+      }
+      
+      .btn:hover {
+        background: #f0f0f0;
+      }
+      
+      .btn-primary {
+        background: #2563eb;
+        color: white;
+        border-color: #2563eb;
+      }
+      
+      .btn-primary:hover {
+        background: #1d4ed8;
+      }
+      
+      .btn-success {
+        background: #16a34a;
+        color: white;
+        border-color: #16a34a;
+      }
+      
+      .btn-success:hover {
+        background: #15803d;
+      }
+      
+      .stats {
+        display: flex;
+        gap: 1.5rem;
+        margin-top: 0.75rem;
+        font-size: 0.875rem;
+        color: #666;
+      }
+      
+      .container {
+        padding: 2rem;
+        max-width: 1600px;
+        margin: 0 auto;
+      }
+      
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+      }
+      
+      .palette-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        transition: all 0.2s;
+      }
+      
+      .palette-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      }
+      
+      .palette-card.hidden {
+        display: none;
+      }
+      
+      .palette-id {
+        font-size: 0.75rem;
+        color: #999;
+        margin-bottom: 0.5rem;
+        font-family: monospace;
+      }
+      
+      .palette-image {
+        width: 100%;
+        height: 240px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+      }
+      
+      .color-swatches {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+      
+      .swatch {
+        flex: 1;
+        height: 40px;
+        border-radius: 4px;
+        position: relative;
+        cursor: pointer;
+      }
+      
+      .swatch-label {
+        position: absolute;
+        bottom: 4px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 0.7rem;
+        font-family: monospace;
+        color: white;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+      }
+      
+      .categories {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      
+      .category-tag {
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        border: 1px solid #d0d0d0;
+        background: white;
+        transition: all 0.2s;
+      }
+      
+      .category-tag:hover {
+        background: #f0f0f0;
+      }
+      
+      .category-tag.selected {
+        background: #2563eb;
+        color: white;
+        border-color: #2563eb;
+      }
+      
+      .category-tag.keep {
+        border-color: #16a34a;
+        color: #16a34a;
+      }
+      
+      .category-tag.keep.selected {
+        background: #16a34a;
+        color: white;
+      }
+      
+      .category-tag.reject {
+        border-color: #dc2626;
+        color: #dc2626;
+      }
+      
+      .category-tag.reject.selected {
+        background: #dc2626;
+        color: white;
+      }
+      
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 200;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .modal.active {
+        display: flex;
+      }
+      
+      .modal-content {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        max-width: 600px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+      }
+      
+      .modal h2 {
+        margin-bottom: 1rem;
+      }
+      
+      .modal textarea {
+        width: 100%;
+        height: 400px;
+        font-family: monospace;
+        font-size: 0.875rem;
+        padding: 1rem;
+        border: 1px solid #d0d0d0;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+      }
+      
+      .modal-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+      }
+      
+      .input-group {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+      
+      .input-group input {
+        flex: 1;
+        padding: 0.5rem;
+        border: 1px solid #d0d0d0;
+        border-radius: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>🎨 Palette Curator</h1>
+      <div class="header-controls">
+        <div class="filter-group">
+          <label>Filter:</label>
+          <button class="category-filter active" data-filter="all">All ({allPalettes.length})</button>
+          <button class="category-filter" data-filter="ocean">Ocean</button>
+          <button class="category-filter" data-filter="pink-magenta">Pink/Magenta</button>
+          <button class="category-filter" data-filter="sunset">Sunset</button>
+          <button class="category-filter" data-filter="sky-ink">Sky/Ink</button>
+          <button class="category-filter" data-filter="green-lime">Green/Lime</button>
+          <button class="category-filter" data-filter="high-contrast">High Contrast</button>
+          <button class="category-filter" data-filter="keep">Keep</button>
+          <button class="category-filter" data-filter="reject">Reject</button>
+          <button class="category-filter" data-filter="uncategorized">Uncategorized</button>
+        </div>
+        <div style="margin-left: auto; display: flex; gap: 0.5rem;">
+          <button class="btn" id="manageCategories">Manage Categories</button>
+          <button class="btn btn-success" id="exportBtn">Export Selection</button>
+        </div>
+      </div>
+      <div class="stats">
+        <span id="totalCount">Total: {allPalettes.length}</span>
+        <span id="keepCount">Keep: 0</span>
+        <span id="rejectCount">Reject: 0</span>
+        <span id="categorizedCount">Categorized: 0</span>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="grid" id="paletteGrid">
+        {allPalettes.map((palette) => (
+          <div class="palette-card" data-id={palette.id}>
+            <div class="palette-id">img{palette.id}.jpg</div>
+            <img 
+              src={palette.imageUrl} 
+              alt={`Palette ${palette.id}`}
+              class="palette-image"
+              loading="lazy"
+            />
+            <div class="color-swatches">
+              {palette.colors.map((color) => (
+                <div class="swatch" style={`background-color: ${rgbToCss(color.rgb)}`}>
+                  <div class="swatch-label">{color.hex}</div>
+                </div>
+              ))}
+            </div>
+            <div class="categories" data-palette-id={palette.id}>
+              <button class="category-tag ocean" data-category="ocean">Ocean</button>
+              <button class="category-tag pink-magenta" data-category="pink-magenta">Pink/Magenta</button>
+              <button class="category-tag sunset" data-category="sunset">Sunset</button>
+              <button class="category-tag sky-ink" data-category="sky-ink">Sky/Ink</button>
+              <button class="category-tag green-lime" data-category="green-lime">Green/Lime</button>
+              <button class="category-tag high-contrast" data-category="high-contrast">High Contrast</button>
+              <button class="category-tag keep" data-category="keep">✓ Keep</button>
+              <button class="category-tag reject" data-category="reject">✗ Reject</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="modal" id="exportModal">
+      <div class="modal-content">
+        <h2>Export Curated Selection</h2>
+        <p style="margin-bottom: 1rem; color: #666;">Copy this to <code>src/data/curatedPalettes.ts</code></p>
+        <textarea id="exportOutput" readonly></textarea>
+        <div class="modal-actions">
+          <button class="btn" onclick="document.getElementById('exportModal').classList.remove('active')">Close</button>
+          <button class="btn btn-primary" id="copyBtn">Copy to Clipboard</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="categoryModal">
+      <div class="modal-content">
+        <h2>Manage Categories</h2>
+        <div class="input-group">
+          <input type="text" id="newCategoryInput" placeholder="New category name (e.g., warm-earth)">
+          <button class="btn btn-primary" id="addCategoryBtn">Add</button>
+        </div>
+        <div id="categoryList" style="margin-bottom: 1rem;"></div>
+        <div class="modal-actions">
+          <button class="btn" onclick="document.getElementById('categoryModal').classList.remove('active')">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <script is:inline>
+      const STORAGE_KEY = 'imagehues_curator_data';
+      const CUSTOM_CATEGORIES_KEY = 'imagehues_custom_categories';
+      
+      let curatorData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      let customCategories = JSON.parse(localStorage.getItem(CUSTOM_CATEGORIES_KEY) || '[]');
+      
+      function saveCuratorData() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(curatorData));
+        updateStats();
+        updateFilterCounts();
+      }
+      
+      function saveCustomCategories() {
+        localStorage.setItem(CUSTOM_CATEGORIES_KEY, JSON.stringify(customCategories));
+      }
+      
+      function toggleCategory(paletteId, category) {
+        if (!curatorData[paletteId]) {
+          curatorData[paletteId] = { categories: [] };
+        }
+        
+        const categories = curatorData[paletteId].categories;
+        const index = categories.indexOf(category);
+        
+        if (index > -1) {
+          categories.splice(index, 1);
+        } else {
+          categories.push(category);
+        }
+        
+        saveCuratorData();
+        updateCardUI(paletteId);
+      }
+      
+      function updateCardUI(paletteId) {
+        const card = document.querySelector(`.palette-card[data-id="${paletteId}"]`);
+        if (!card) return;
+        
+        const categoriesContainer = card.querySelector('.categories');
+        const buttons = categoriesContainer.querySelectorAll('.category-tag');
+        
+        const paletteCategories = curatorData[paletteId]?.categories || [];
+        
+        buttons.forEach(btn => {
+          const category = btn.dataset.category;
+          if (paletteCategories.includes(category)) {
+            btn.classList.add('selected');
+          } else {
+            btn.classList.remove('selected');
+          }
+        });
+      }
+      
+      function updateStats() {
+        const keepCount = Object.values(curatorData).filter(p => p.categories.includes('keep')).length;
+        const rejectCount = Object.values(curatorData).filter(p => p.categories.includes('reject')).length;
+        const categorizedCount = Object.keys(curatorData).filter(id => curatorData[id].categories.length > 0).length;
+        
+        document.getElementById('keepCount').textContent = `Keep: ${keepCount}`;
+        document.getElementById('rejectCount').textContent = `Reject: ${rejectCount}`;
+        document.getElementById('categorizedCount').textContent = `Categorized: ${categorizedCount}`;
+      }
+      
+      function updateFilterCounts() {
+        const filters = document.querySelectorAll('.category-filter');
+        filters.forEach(filter => {
+          const category = filter.dataset.filter;
+          if (category === 'all') return;
+          
+          let count = 0;
+          if (category === 'uncategorized') {
+            const allPaletteIds = Array.from(document.querySelectorAll('.palette-card')).map(c => c.dataset.id);
+            count = allPaletteIds.filter(id => !curatorData[id] || curatorData[id].categories.length === 0).length;
+          } else {
+            count = Object.values(curatorData).filter(p => p.categories.includes(category)).length;
+          }
+          
+          const currentText = filter.textContent.split(' (')[0];
+          filter.textContent = count > 0 ? `${currentText} (${count})` : currentText;
+        });
+      }
+      
+      function filterPalettes(category) {
+        const cards = document.querySelectorAll('.palette-card');
+        
+        cards.forEach(card => {
+          const paletteId = card.dataset.id;
+          const paletteCategories = curatorData[paletteId]?.categories || [];
+          
+          if (category === 'all') {
+            card.classList.remove('hidden');
+          } else if (category === 'uncategorized') {
+            if (paletteCategories.length === 0) {
+              card.classList.remove('hidden');
+            } else {
+              card.classList.add('hidden');
+            }
+          } else {
+            if (paletteCategories.includes(category)) {
+              card.classList.remove('hidden');
+            } else {
+              card.classList.add('hidden');
+            }
+          }
+        });
+      }
+      
+      function addCustomCategory(name) {
+        const slug = name.toLowerCase().replace(/\s+/g, '-');
+        if (customCategories.find(c => c.slug === slug)) {
+          alert('Category already exists');
+          return;
+        }
+        
+        customCategories.push({ name, slug });
+        saveCustomCategories();
+        addCategoryToAllCards(slug, name);
+        updateCategoryManagement();
+        
+        // Add filter button
+        const filterGroup = document.querySelector('.filter-group');
+        const btn = document.createElement('button');
+        btn.className = 'category-filter';
+        btn.dataset.filter = slug;
+        btn.textContent = name;
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.category-filter').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          filterPalettes(slug);
+        });
+        filterGroup.insertBefore(btn, filterGroup.querySelector('[data-filter="uncategorized"]'));
+      }
+      
+      function addCategoryToAllCards(slug, name) {
+        const cards = document.querySelectorAll('.palette-card');
+        cards.forEach(card => {
+          const categoriesContainer = card.querySelector('.categories');
+          const btn = document.createElement('button');
+          btn.className = 'category-tag';
+          btn.dataset.category = slug;
+          btn.textContent = name;
+          btn.addEventListener('click', () => {
+            const paletteId = card.dataset.id;
+            toggleCategory(paletteId, slug);
+          });
+          categoriesContainer.insertBefore(btn, categoriesContainer.querySelector('[data-category="keep"]'));
+        });
+      }
+      
+      function updateCategoryManagement() {
+        const list = document.getElementById('categoryList');
+        list.innerHTML = '<h3 style="margin-bottom: 0.5rem; font-size: 0.875rem;">Custom Categories:</h3>';
+        
+        if (customCategories.length === 0) {
+          list.innerHTML += '<p style="color: #999; font-size: 0.875rem;">No custom categories yet.</p>';
+          return;
+        }
+        
+        customCategories.forEach((cat, index) => {
+          const div = document.createElement('div');
+          div.style.cssText = 'display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;';
+          div.innerHTML = `
+            <span style="flex: 1;">${cat.name}</span>
+            <button class="btn" onclick="removeCustomCategory(${index})">Remove</button>
+          `;
+          list.appendChild(div);
+        });
+      }
+      
+      window.removeCustomCategory = function(index) {
+        const category = customCategories[index];
+        if (!confirm(`Remove category "${category.name}"? This will remove it from all palettes.`)) return;
+        
+        // Remove from all palettes
+        Object.keys(curatorData).forEach(id => {
+          const cats = curatorData[id].categories;
+          const idx = cats.indexOf(category.slug);
+          if (idx > -1) cats.splice(idx, 1);
+        });
+        
+        customCategories.splice(index, 1);
+        saveCustomCategories();
+        saveCuratorData();
+        
+        // Remove from UI
+        document.querySelectorAll(`[data-category="${category.slug}"]`).forEach(el => el.remove());
+        document.querySelector(`[data-filter="${category.slug}"]`)?.remove();
+        
+        updateCategoryManagement();
+      };
+      
+      // Initialize
+      document.addEventListener('DOMContentLoaded', () => {
+        // Restore UI state
+        Object.keys(curatorData).forEach(id => updateCardUI(id));
+        updateStats();
+        updateFilterCounts();
+        
+        // Restore custom categories
+        customCategories.forEach(cat => {
+          addCategoryToAllCards(cat.slug, cat.name);
+          const filterGroup = document.querySelector('.filter-group');
+          const btn = document.createElement('button');
+          btn.className = 'category-filter';
+          btn.dataset.filter = cat.slug;
+          btn.textContent = cat.name;
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.category-filter').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            filterPalettes(cat.slug);
+          });
+          filterGroup.insertBefore(btn, filterGroup.querySelector('[data-filter="uncategorized"]'));
+        });
+        
+        // Category button clicks
+        document.querySelectorAll('.category-tag').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const paletteId = e.target.closest('.palette-card').dataset.id;
+            const category = e.target.dataset.category;
+            toggleCategory(paletteId, category);
+          });
+        });
+        
+        // Filter buttons
+        document.querySelectorAll('.category-filter').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.category-filter').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            filterPalettes(btn.dataset.filter);
+          });
+        });
+        
+        // Export button
+        document.getElementById('exportBtn').addEventListener('click', () => {
+          const kept = Object.entries(curatorData)
+            .filter(([id, data]) => data.categories.includes('keep'))
+            .sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
+          
+          const exported = kept.map(([id, data]) => {
+            const categories = data.categories.filter(c => c !== 'keep' && c !== 'reject');
+            return { id, categories };
+          });
+          
+          const output = `// Curated palette selection - exported from /curate/
+// ${new Date().toISOString()}
+// ${exported.length} palettes selected
+
+export const CURATED_PALETTES: string[] = [
+${exported.map(p => `  '${p.id}', // ${p.categories.join(', ') || 'uncategorized'}`).join('\n')}
+];
+
+// Category breakdown:
+${exported.map(p => `// ${p.id}: ${p.categories.join(', ') || 'uncategorized'}`).join('\n')}
+`;
+          
+          document.getElementById('exportOutput').value = output;
+          document.getElementById('exportModal').classList.add('active');
+        });
+        
+        // Copy button
+        document.getElementById('copyBtn').addEventListener('click', () => {
+          const textarea = document.getElementById('exportOutput');
+          textarea.select();
+          document.execCommand('copy');
+          alert('Copied to clipboard!');
+        });
+        
+        // Manage categories
+        document.getElementById('manageCategories').addEventListener('click', () => {
+          updateCategoryManagement();
+          document.getElementById('categoryModal').classList.add('active');
+        });
+        
+        document.getElementById('addCategoryBtn').addEventListener('click', () => {
+          const input = document.getElementById('newCategoryInput');
+          const name = input.value.trim();
+          if (!name) return;
+          
+          addCustomCategory(name);
+          input.value = '';
+        });
+      });
+    </script>
+  </body>
+</html>

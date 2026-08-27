@@ -8,7 +8,7 @@ export default defineConfig({
   site,
   integrations: [
     sitemap({
-      filter: (page) => !page.includes('/favourites/'),
+      filter: (page) => !page.includes('/favourites/') && !page.includes('/curate/'),
       customPages: [],
     }),
   ],
