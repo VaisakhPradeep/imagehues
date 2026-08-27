@@ -1,20 +1,33 @@
 ---
 import palettes from "../../../public/data/palettes.json";
+import { PALETTE_SUGGESTIONS } from "../../data/paletteSuggestions";
 
 const allPalettes = Object.keys(palettes).map((imageUrl) => {
   const match = imageUrl.match(/img(\d+)\.jpg$/);
   if (!match) return null;
   
+  const id = match[1];
   return {
-    id: match[1],
+    id,
     imageUrl,
     colors: palettes[imageUrl],
+    suggestions: PALETTE_SUGGESTIONS[id] || [],
   };
 }).filter(Boolean);
 
 function rgbToCss(rgb: number[]) {
   return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
 }
+
+// The 20 photo-scene categories
+const CATEGORIES = [
+  // KEEP categories
+  'Sunset', 'Sunrise', 'Golden hour', 'Beach', 'Ocean', 'Forest', 'Autumn', 
+  'Desert', 'Mountain', 'Tropical', 'Aurora',
+  // STRETCH categories
+  'Canyon', 'Rainforest', 'Wildflower', 'Waterfall', 'Coral reef', 'Woodland', 
+  'Fog', 'Dusk', 'Meadow'
+];
 ---
 
 <!DOCTYPE html>
@@ -74,12 +87,12 @@ function rgbToCss(rgb: number[]) {
       }
       
       .category-filter {
-        padding: 0.5rem 1rem;
+        padding: 0.4rem 0.75rem;
         border: 1px solid #d0d0d0;
         border-radius: 6px;
         background: white;
         cursor: pointer;
-        font-size: 0.875rem;
+        font-size: 0.8125rem;
         transition: all 0.2s;
       }
       
@@ -205,6 +218,27 @@ function rgbToCss(rgb: number[]) {
         text-shadow: 0 1px 2px rgba(0,0,0,0.5);
       }
       
+      .suggestions-section {
+        margin-bottom: 0.75rem;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+      }
+      
+      .suggestions-label {
+        font-size: 0.75rem;
+        color: #666;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      
+      .suggestions-label svg {
+        width: 14px;
+        height: 14px;
+      }
+      
       .categories {
         display: flex;
         flex-wrap: wrap;
@@ -225,30 +259,32 @@ function rgbToCss(rgb: number[]) {
         background: #f0f0f0;
       }
       
-      .category-tag.selected {
-        background: #2563eb;
-        color: white;
-        border-color: #2563eb;
+      .category-tag.suggested {
+        border-color: #93c5fd;
+        background: #eff6ff;
+        color: #1e40af;
       }
       
-      .category-tag.keep {
-        border-color: #16a34a;
-        color: #16a34a;
-      }
-      
-      .category-tag.keep.selected {
+      .category-tag.confirmed {
         background: #16a34a;
         color: white;
+        border-color: #16a34a;
       }
       
-      .category-tag.reject {
-        border-color: #dc2626;
-        color: #dc2626;
+      .category-tag.confirmed.suggested {
+        background: #059669;
+        border-color: #059669;
       }
       
-      .category-tag.reject.selected {
-        background: #dc2626;
-        color: white;
+      .confirmed-section {
+        margin-top: 0.75rem;
+      }
+      
+      .confirmed-label {
+        font-size: 0.75rem;
+        color: #666;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
       }
       
       .modal {
@@ -272,7 +308,7 @@ function rgbToCss(rgb: number[]) {
         background: white;
         border-radius: 12px;
         padding: 2rem;
-        max-width: 600px;
+        max-width: 700px;
         width: 90%;
         max-height: 80vh;
         overflow-y: auto;
@@ -311,6 +347,14 @@ function rgbToCss(rgb: number[]) {
         border: 1px solid #d0d0d0;
         border-radius: 6px;
       }
+      
+      .empty-state {
+        text-align: center;
+        padding: 1rem;
+        color: #999;
+        font-size: 0.875rem;
+        font-style: italic;
+      }
     </style>
   </head>
   <body>
@@ -320,33 +364,29 @@ function rgbToCss(rgb: number[]) {
         <div class="filter-group">
           <label>Filter:</label>
           <button class="category-filter active" data-filter="all">All ({allPalettes.length})</button>
-          <button class="category-filter" data-filter="ocean">Ocean</button>
-          <button class="category-filter" data-filter="pink-magenta">Pink/Magenta</button>
-          <button class="category-filter" data-filter="sunset">Sunset</button>
-          <button class="category-filter" data-filter="sky-ink">Sky/Ink</button>
-          <button class="category-filter" data-filter="green-lime">Green/Lime</button>
-          <button class="category-filter" data-filter="high-contrast">High Contrast</button>
-          <button class="category-filter" data-filter="keep">Keep</button>
-          <button class="category-filter" data-filter="reject">Reject</button>
+          {CATEGORIES.map(cat => (
+            <button class="category-filter" data-filter={cat.toLowerCase().replace(/\s+/g, '-')}>{cat}</button>
+          ))}
+          <button class="category-filter" data-filter="has-suggestions">Has Suggestions</button>
+          <button class="category-filter" data-filter="confirmed">Confirmed</button>
           <button class="category-filter" data-filter="uncategorized">Uncategorized</button>
         </div>
         <div style="margin-left: auto; display: flex; gap: 0.5rem;">
-          <button class="btn" id="manageCategories">Manage Categories</button>
+          <button class="btn" id="manageCategories">Add Custom Category</button>
           <button class="btn btn-success" id="exportBtn">Export Selection</button>
         </div>
       </div>
       <div class="stats">
         <span id="totalCount">Total: {allPalettes.length}</span>
-        <span id="keepCount">Keep: 0</span>
-        <span id="rejectCount">Reject: 0</span>
-        <span id="categorizedCount">Categorized: 0</span>
+        <span id="withSuggestions">With suggestions: {Object.keys(PALETTE_SUGGESTIONS).length}</span>
+        <span id="confirmedCount">Confirmed: 0</span>
       </div>
     </div>
 
     <div class="container">
       <div class="grid" id="paletteGrid">
         {allPalettes.map((palette) => (
-          <div class="palette-card" data-id={palette.id}>
+          <div class="palette-card" data-id={palette.id} data-suggestions={JSON.stringify(palette.suggestions)}>
             <div class="palette-id">img{palette.id}.jpg</div>
             <img 
               src={palette.imageUrl} 
@@ -361,15 +401,28 @@ function rgbToCss(rgb: number[]) {
                 </div>
               ))}
             </div>
-            <div class="categories" data-palette-id={palette.id}>
-              <button class="category-tag ocean" data-category="ocean">Ocean</button>
-              <button class="category-tag pink-magenta" data-category="pink-magenta">Pink/Magenta</button>
-              <button class="category-tag sunset" data-category="sunset">Sunset</button>
-              <button class="category-tag sky-ink" data-category="sky-ink">Sky/Ink</button>
-              <button class="category-tag green-lime" data-category="green-lime">Green/Lime</button>
-              <button class="category-tag high-contrast" data-category="high-contrast">High Contrast</button>
-              <button class="category-tag keep" data-category="keep">✓ Keep</button>
-              <button class="category-tag reject" data-category="reject">✗ Reject</button>
+            
+            {palette.suggestions.length > 0 && (
+              <div class="suggestions-section">
+                <div class="suggestions-label">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                  Suggested ({palette.suggestions.length})
+                </div>
+                <div class="categories" data-palette-id={palette.id} data-type="suggestions">
+                  {palette.suggestions.map((cat) => (
+                    <button class="category-tag suggested" data-category={cat}>{cat}</button>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            <div class="confirmed-section">
+              <div class="confirmed-label">Click to confirm or add more:</div>
+              <div class="categories" data-palette-id={palette.id} data-type="all">
+                {CATEGORIES.map((cat) => (
+                  <button class="category-tag" data-category={cat}>{cat}</button>
+                ))}
+              </div>
             </div>
           </div>
         ))}
@@ -390,9 +443,12 @@ function rgbToCss(rgb: number[]) {
 
     <div class="modal" id="categoryModal">
       <div class="modal-content">
-        <h2>Manage Categories</h2>
+        <h2>Add Custom Category</h2>
+        <p style="margin-bottom: 1rem; color: #666; font-size: 0.875rem;">
+          The 20 default categories cover most scenes. Add custom ones only if you find recurring themes not covered.
+        </p>
         <div class="input-group">
-          <input type="text" id="newCategoryInput" placeholder="New category name (e.g., warm-earth)">
+          <input type="text" id="newCategoryInput" placeholder="e.g., Cityscape, Winter">
           <button class="btn btn-primary" id="addCategoryBtn">Add</button>
         </div>
         <div id="categoryList" style="margin-bottom: 1rem;"></div>
@@ -402,9 +458,9 @@ function rgbToCss(rgb: number[]) {
       </div>
     </div>
 
-    <script is:inline>
-      const STORAGE_KEY = 'imagehues_curator_data';
-      const CUSTOM_CATEGORIES_KEY = 'imagehues_custom_categories';
+    <script is:inline define:vars={{ paletteSuggestions: PALETTE_SUGGESTIONS, defaultCategories: CATEGORIES }}>
+      const STORAGE_KEY = 'imagehues_curator_v2';
+      const CUSTOM_CATEGORIES_KEY = 'imagehues_custom_categories_v2';
       
       let curatorData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
       let customCategories = JSON.parse(localStorage.getItem(CUSTOM_CATEGORIES_KEY) || '[]');
@@ -421,16 +477,16 @@ function rgbToCss(rgb: number[]) {
       
       function toggleCategory(paletteId, category) {
         if (!curatorData[paletteId]) {
-          curatorData[paletteId] = { categories: [] };
+          curatorData[paletteId] = { confirmed: [] };
         }
         
-        const categories = curatorData[paletteId].categories;
-        const index = categories.indexOf(category);
+        const confirmed = curatorData[paletteId].confirmed;
+        const index = confirmed.indexOf(category);
         
         if (index > -1) {
-          categories.splice(index, 1);
+          confirmed.splice(index, 1);
         } else {
-          categories.push(category);
+          confirmed.push(category);
         }
         
         saveCuratorData();
@@ -441,29 +497,28 @@ function rgbToCss(rgb: number[]) {
         const card = document.querySelector(`.palette-card[data-id="${paletteId}"]`);
         if (!card) return;
         
-        const categoriesContainer = card.querySelector('.categories');
-        const buttons = categoriesContainer.querySelectorAll('.category-tag');
+        const allContainer = card.querySelector('.categories[data-type="all"]');
+        const buttons = allContainer.querySelectorAll('.category-tag');
         
-        const paletteCategories = curatorData[paletteId]?.categories || [];
+        const confirmedCats = curatorData[paletteId]?.confirmed || [];
+        const suggestions = JSON.parse(card.dataset.suggestions || '[]');
         
         buttons.forEach(btn => {
           const category = btn.dataset.category;
-          if (paletteCategories.includes(category)) {
-            btn.classList.add('selected');
-          } else {
-            btn.classList.remove('selected');
-          }
+          const isConfirmed = confirmedCats.includes(category);
+          const isSuggested = suggestions.includes(category);
+          
+          btn.classList.toggle('confirmed', isConfirmed);
+          btn.classList.toggle('suggested', isSuggested);
         });
       }
       
       function updateStats() {
-        const keepCount = Object.values(curatorData).filter(p => p.categories.includes('keep')).length;
-        const rejectCount = Object.values(curatorData).filter(p => p.categories.includes('reject')).length;
-        const categorizedCount = Object.keys(curatorData).filter(id => curatorData[id].categories.length > 0).length;
+        const confirmedCount = Object.keys(curatorData).filter(id => 
+          curatorData[id].confirmed && curatorData[id].confirmed.length > 0
+        ).length;
         
-        document.getElementById('keepCount').textContent = `Keep: ${keepCount}`;
-        document.getElementById('rejectCount').textContent = `Reject: ${rejectCount}`;
-        document.getElementById('categorizedCount').textContent = `Categorized: ${categorizedCount}`;
+        document.getElementById('confirmedCount').textContent = `Confirmed: ${confirmedCount}`;
       }
       
       function updateFilterCounts() {
@@ -475,9 +530,20 @@ function rgbToCss(rgb: number[]) {
           let count = 0;
           if (category === 'uncategorized') {
             const allPaletteIds = Array.from(document.querySelectorAll('.palette-card')).map(c => c.dataset.id);
-            count = allPaletteIds.filter(id => !curatorData[id] || curatorData[id].categories.length === 0).length;
+            count = allPaletteIds.filter(id => 
+              !curatorData[id] || !curatorData[id].confirmed || curatorData[id].confirmed.length === 0
+            ).length;
+          } else if (category === 'has-suggestions') {
+            count = Object.keys(paletteSuggestions).length;
+          } else if (category === 'confirmed') {
+            count = Object.keys(curatorData).filter(id => 
+              curatorData[id].confirmed && curatorData[id].confirmed.length > 0
+            ).length;
           } else {
-            count = Object.values(curatorData).filter(p => p.categories.includes(category)).length;
+            const catName = category.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+            count = Object.values(curatorData).filter(p => 
+              p.confirmed && p.confirmed.includes(catName)
+            ).length;
           }
           
           const currentText = filter.textContent.split(' (')[0];
@@ -485,27 +551,25 @@ function rgbToCss(rgb: number[]) {
         });
       }
       
-      function filterPalettes(category) {
+      function filterPalettes(filterValue) {
         const cards = document.querySelectorAll('.palette-card');
         
         cards.forEach(card => {
           const paletteId = card.dataset.id;
-          const paletteCategories = curatorData[paletteId]?.categories || [];
+          const confirmedCats = curatorData[paletteId]?.confirmed || [];
+          const suggestions = JSON.parse(card.dataset.suggestions || '[]');
           
-          if (category === 'all') {
+          if (filterValue === 'all') {
             card.classList.remove('hidden');
-          } else if (category === 'uncategorized') {
-            if (paletteCategories.length === 0) {
-              card.classList.remove('hidden');
-            } else {
-              card.classList.add('hidden');
-            }
+          } else if (filterValue === 'uncategorized') {
+            card.classList.toggle('hidden', confirmedCats.length > 0);
+          } else if (filterValue === 'has-suggestions') {
+            card.classList.toggle('hidden', suggestions.length === 0);
+          } else if (filterValue === 'confirmed') {
+            card.classList.toggle('hidden', confirmedCats.length === 0);
           } else {
-            if (paletteCategories.includes(category)) {
-              card.classList.remove('hidden');
-            } else {
-              card.classList.add('hidden');
-            }
+            const catName = filterValue.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+            card.classList.toggle('hidden', !confirmedCats.includes(catName));
           }
         });
       }
@@ -517,9 +581,14 @@ function rgbToCss(rgb: number[]) {
           return;
         }
         
+        if (defaultCategories.includes(name)) {
+          alert('This is already a default category');
+          return;
+        }
+        
         customCategories.push({ name, slug });
         saveCustomCategories();
-        addCategoryToAllCards(slug, name);
+        addCategoryToAllCards(name);
         updateCategoryManagement();
         
         // Add filter button
@@ -533,22 +602,22 @@ function rgbToCss(rgb: number[]) {
           btn.classList.add('active');
           filterPalettes(slug);
         });
-        filterGroup.insertBefore(btn, filterGroup.querySelector('[data-filter="uncategorized"]'));
+        filterGroup.insertBefore(btn, filterGroup.querySelector('[data-filter="has-suggestions"]'));
       }
       
-      function addCategoryToAllCards(slug, name) {
+      function addCategoryToAllCards(name) {
         const cards = document.querySelectorAll('.palette-card');
         cards.forEach(card => {
-          const categoriesContainer = card.querySelector('.categories');
+          const container = card.querySelector('.categories[data-type="all"]');
           const btn = document.createElement('button');
           btn.className = 'category-tag';
-          btn.dataset.category = slug;
+          btn.dataset.category = name;
           btn.textContent = name;
           btn.addEventListener('click', () => {
             const paletteId = card.dataset.id;
-            toggleCategory(paletteId, slug);
+            toggleCategory(paletteId, name);
           });
-          categoriesContainer.insertBefore(btn, categoriesContainer.querySelector('[data-category="keep"]'));
+          container.appendChild(btn);
         });
       }
       
@@ -578,9 +647,9 @@ function rgbToCss(rgb: number[]) {
         
         // Remove from all palettes
         Object.keys(curatorData).forEach(id => {
-          const cats = curatorData[id].categories;
-          const idx = cats.indexOf(category.slug);
-          if (idx > -1) cats.splice(idx, 1);
+          const confirmed = curatorData[id].confirmed;
+          const idx = confirmed.indexOf(category.name);
+          if (idx > -1) confirmed.splice(idx, 1);
         });
         
         customCategories.splice(index, 1);
@@ -588,7 +657,7 @@ function rgbToCss(rgb: number[]) {
         saveCuratorData();
         
         // Remove from UI
-        document.querySelectorAll(`[data-category="${category.slug}"]`).forEach(el => el.remove());
+        document.querySelectorAll(`[data-category="${category.name}"]`).forEach(el => el.remove());
         document.querySelector(`[data-filter="${category.slug}"]`)?.remove();
         
         updateCategoryManagement();
@@ -603,7 +672,7 @@ function rgbToCss(rgb: number[]) {
         
         // Restore custom categories
         customCategories.forEach(cat => {
-          addCategoryToAllCards(cat.slug, cat.name);
+          addCategoryToAllCards(cat.name);
           const filterGroup = document.querySelector('.filter-group');
           const btn = document.createElement('button');
           btn.className = 'category-filter';
@@ -614,13 +683,14 @@ function rgbToCss(rgb: number[]) {
             btn.classList.add('active');
             filterPalettes(cat.slug);
           });
-          filterGroup.insertBefore(btn, filterGroup.querySelector('[data-filter="uncategorized"]'));
+          filterGroup.insertBefore(btn, filterGroup.querySelector('[data-filter="has-suggestions"]'));
         });
         
         // Category button clicks
         document.querySelectorAll('.category-tag').forEach(btn => {
           btn.addEventListener('click', (e) => {
-            const paletteId = e.target.closest('.palette-card').dataset.id;
+            const card = e.target.closest('.palette-card');
+            const paletteId = card.dataset.id;
             const category = e.target.dataset.category;
             toggleCategory(paletteId, category);
           });
@@ -637,25 +707,25 @@ function rgbToCss(rgb: number[]) {
         
         // Export button
         document.getElementById('exportBtn').addEventListener('click', () => {
-          const kept = Object.entries(curatorData)
-            .filter(([id, data]) => data.categories.includes('keep'))
+          const confirmed = Object.entries(curatorData)
+            .filter(([id, data]) => data.confirmed && data.confirmed.length > 0)
             .sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
           
-          const exported = kept.map(([id, data]) => {
-            const categories = data.categories.filter(c => c !== 'keep' && c !== 'reject');
-            return { id, categories };
-          });
+          const exported = confirmed.map(([id, data]) => ({
+            id,
+            categories: data.confirmed
+          }));
           
           const output = `// Curated palette selection - exported from /curate/
 // ${new Date().toISOString()}
 // ${exported.length} palettes selected
 
 export const CURATED_PALETTES: string[] = [
-${exported.map(p => `  '${p.id}', // ${p.categories.join(', ') || 'uncategorized'}`).join('\n')}
+${exported.map(p => `  '${p.id}', // ${p.categories.join(', ')}`).join('\n')}
 ];
 
 // Category breakdown:
-${exported.map(p => `// ${p.id}: ${p.categories.join(', ') || 'uncategorized'}`).join('\n')}
+${exported.map(p => `// ${p.id}: ${p.categories.join(', ')}`).join('\n')}
 `;
           
           document.getElementById('exportOutput').value = output;
