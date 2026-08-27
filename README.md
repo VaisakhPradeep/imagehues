@@ -9,7 +9,7 @@ Natural, fresh color palettes extracted from beautiful photos. Click any swatch 
 - [Astro](https://astro.build) — static site generator
 - [Tailwind CSS](https://tailwindcss.com) — utility-first CSS framework
 - Custom palette extraction algorithm using [sharp](https://sharp.pixelplumbing.com/) (build time)
-- [ColorThief](https://lokeshdhakar.com/projects/color-thief/) — browser fallback for user-uploaded images
+- PaletteExtract — browser-side palette extraction for user-uploaded images
 - GitHub Actions — build & deploy to GitHub Pages
 
 ## Local development
@@ -40,7 +40,7 @@ PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 ## Project structure
 
 ```
-src/          Astro pages, layout, Sass
+src/          Astro pages, layout, styles
 public/       Static assets (images, JS, palettes data)
 scripts/      Build scripts (palette precomputation)
 dist/         Production output (generated — do not edit)
