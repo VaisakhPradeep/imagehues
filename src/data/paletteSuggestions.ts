@@ -2,6 +2,7 @@
 // Method: Systematic visual inspection of every JPEG in public/unsplash_images/
 // 
 // Progress: Batch 1 - Images 0-99 completed
+//           Batch 2 - Images 100-149 completed
 // 
 // KEY FINDINGS about this dataset:
 // - MAJORITY are NOT nature/landscape scenes (est. 85-90%)
@@ -45,6 +46,9 @@ export const PALETTE_SUGGESTIONS: Record<string, string[]> = {
   "44": ["Ocean"],
   "66": ["Desert"],
   "99": ["Autumn"],
+  "107": ["Canyon"],
+  "119": ["Dusk", "Mountain"],
+  "143": ["Autumn"],
   "400": ["Aurora", "Desert"],
   "1000": ["Desert"]
 };
