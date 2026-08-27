@@ -1,0 +1,177 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import palettes from "../../../public/data/palettes.json";
+import { CURATED_PALETTES } from "../../data/curatedPalettes";
+
+export async function getStaticPaths() {
+  const paths = CURATED_PALETTES.map((slug) => {
+    const imageUrl = `/unsplash_images/img${slug}.jpg`;
+    const colors = palettes[imageUrl];
+    
+    if (!colors) {
+      console.warn(`⚠️  Curated palette ${slug} not found in palettes.json`);
+      return null;
+    }
+    
+    return {
+      params: { slug },
+      props: { 
+        imageUrl, 
+        colors,
+        paletteIndex: slug
+      },
+    };
+  }).filter(Boolean);
+  
+  return paths;
+}
+
+const { imageUrl, colors, paletteIndex } = Astro.props;
+
+function rgbToCss(rgb: number[]) {
+  return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+}
+
+const hexCodes = colors.map(c => c.hex).join(', ');
+const title = `Color Palette ${hexCodes} – Image Hues`;
+const description = `Natural color palette extracted from a curated photo: ${hexCodes}. Free hex codes for designers and illustrators.`;
+const canonicalPath = `/palette/${paletteIndex}/`;
+const imageFullUrl = `https://imagehues.com${imageUrl}`;
+const pageUrl = `https://imagehues.com${canonicalPath}`;
+
+// Get related palettes (3 random from the curated set, excluding current)
+const relatedSlugs = CURATED_PALETTES
+  .filter(s => s !== paletteIndex)
+  .sort(() => Math.random() - 0.5)
+  .slice(0, 3);
+
+const relatedPalettes = relatedSlugs.map(slug => {
+  const url = `/unsplash_images/img${slug}.jpg`;
+  return {
+    slug,
+    imageUrl: url,
+    colors: palettes[url] || [],
+  };
+}).filter(p => p.colors.length > 0);
+
+const imageObjectSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ImageObject',
+  contentUrl: imageFullUrl,
+  url: pageUrl,
+  name: title,
+  description: description,
+  author: {
+    '@type': 'Organization',
+    name: 'Image Hues',
+  },
+  mainEntity: {
+    '@type': 'ItemList',
+    numberOfItems: colors.length,
+    itemListElement: colors.map((color, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'Color',
+        name: color.hex,
+        identifier: color.hex,
+      },
+    })),
+  },
+};
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonicalPath={canonicalPath}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(imageObjectSchema)} />
+  
+  <div class="mx-auto max-w-[800px] px-6 py-24 max-lg:py-16 max-[480px]:px-4">
+    <div class="mb-8 flex items-center justify-between">
+      <a href="/palettes/" class="text-sm text-text-secondary hover:text-text-primary transition-colors">
+        ← All curated palettes
+      </a>
+      <a href="/" class="text-sm text-text-secondary hover:text-text-primary transition-colors">
+        Home
+      </a>
+    </div>
+    
+    <h1 class="mb-8 font-sans text-[36px] leading-[44px] font-medium text-text-primary max-md:text-[28px] max-md:leading-[36px]">
+      Color Palette {hexCodes}
+    </h1>
+    
+    <div class="mb-8 rounded-[18px] bg-surface p-4 shadow-card">
+      <img
+        src={imageUrl}
+        alt={`Natural color palette ${hexCodes} from curated photograph`}
+        width="800"
+        height="600"
+        class="w-full rounded-[6px]"
+        loading="eager"
+      />
+    </div>
+    
+    <div class="mb-8">
+      <h2 class="mb-4 text-xl font-medium text-text-primary">Hex Colors</h2>
+      <div class="grid grid-cols-2 gap-4 max-[480px]:grid-cols-1">
+        {colors.map((color) => (
+          <div class="flex items-center gap-4 rounded-lg bg-surface p-4 shadow-card">
+            <div
+              class="h-16 w-16 flex-shrink-0 rounded-lg"
+              style={`background-color: ${rgbToCss(color.rgb)}`}
+            />
+            <div>
+              <div class="font-mono text-lg font-medium text-text-primary">
+                {color.hex}
+              </div>
+              <div class="text-sm text-text-secondary">
+                RGB({color.rgb[0]}, {color.rgb[1]}, {color.rgb[2]})
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+    
+    <div class="mb-8 rounded-lg bg-surface p-6 shadow-card">
+      <h2 class="mb-3 text-xl font-medium text-text-primary">About This Palette</h2>
+      <p class="mb-4 text-text-secondary">
+        This natural color palette was extracted from a carefully curated photograph. The colors {hexCodes} work beautifully together and can inspire your next design project.
+      </p>
+      <p class="text-text-secondary">
+        <a href="/palettes/" class="text-text-primary hover:underline">Browse more curated palettes</a>, explore the <a href="/" class="text-text-primary hover:underline">full gallery</a>, or <a href="/about/" class="text-text-primary hover:underline">learn more about Image Hues</a>.
+      </p>
+    </div>
+
+    {relatedPalettes.length > 0 && (
+      <div class="mt-12">
+        <h2 class="mb-6 text-2xl font-medium text-text-primary">Related Palettes</h2>
+        <div class="grid grid-cols-3 gap-4 max-md:grid-cols-2 max-[480px]:grid-cols-1">
+          {relatedPalettes.map((palette) => (
+            <a href={`/palette/${palette.slug}/`} class="group block rounded-[12px] bg-surface p-2 shadow-card transition-transform hover:scale-105">
+              <img
+                src={palette.imageUrl}
+                alt={`Color palette ${palette.colors.map(c => c.hex).join(', ')}`}
+                width="300"
+                height="225"
+                class="w-full rounded-[6px] mb-2"
+                loading="lazy"
+              />
+              <div class="flex gap-1 px-2 pb-2">
+                {palette.colors.map((color) => (
+                  <div
+                    class="h-4 flex-1 rounded"
+                    style={`background-color: ${rgbToCss(color.rgb)}`}
+                    title={color.hex}
+                  />
+                ))}
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+</BaseLayout>
