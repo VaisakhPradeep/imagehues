@@ -1,0 +1,760 @@
+---
+import palettes from "../../../public/data/palettes.json";
+import { PALETTE_SUGGESTIONS } from "../../data/paletteSuggestions";
+
+const allPalettes = Object.keys(palettes).map((imageUrl) => {
+  const match = imageUrl.match(/img(\d+)\.jpg$/);
+  if (!match) return null;
+  
+  const id = match[1];
+  return {
+    id,
+    imageUrl,
+    colors: palettes[imageUrl],
+    suggestions: PALETTE_SUGGESTIONS[id] || [],
+  };
+}).filter(Boolean);
+
+function rgbToCss(rgb: number[]) {
+  return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+}
+
+// The 20 photo-scene categories
+const CATEGORIES = [
+  // KEEP categories
+  'Sunset', 'Sunrise', 'Golden hour', 'Beach', 'Ocean', 'Forest', 'Autumn', 
+  'Desert', 'Mountain', 'Tropical', 'Aurora',
+  // STRETCH categories
+  'Canyon', 'Rainforest', 'Wildflower', 'Waterfall', 'Coral reef', 'Woodland', 
+  'Fog', 'Dusk', 'Meadow'
+];
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Palette Curator – Internal Tool</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #f5f5f5;
+        color: #1a1a1a;
+        line-height: 1.5;
+      }
+      
+      .header {
+        background: white;
+        border-bottom: 1px solid #e0e0e0;
+        padding: 1rem 2rem;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      }
+      
+      .header h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+      
+      .header-controls {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      
+      .filter-group {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      
+      .filter-group label {
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+      
+      .category-filter {
+        padding: 0.4rem 0.75rem;
+        border: 1px solid #d0d0d0;
+        border-radius: 6px;
+        background: white;
+        cursor: pointer;
+        font-size: 0.8125rem;
+        transition: all 0.2s;
+      }
+      
+      .category-filter:hover {
+        background: #f0f0f0;
+      }
+      
+      .category-filter.active {
+        background: #2563eb;
+        color: white;
+        border-color: #2563eb;
+      }
+      
+      .btn {
+        padding: 0.5rem 1rem;
+        border: 1px solid #d0d0d0;
+        border-radius: 6px;
+        background: white;
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.2s;
+      }
+      
+      .btn:hover {
+        background: #f0f0f0;
+      }
+      
+      .btn-primary {
+        background: #2563eb;
+        color: white;
+        border-color: #2563eb;
+      }
+      
+      .btn-primary:hover {
+        background: #1d4ed8;
+      }
+      
+      .btn-success {
+        background: #16a34a;
+        color: white;
+        border-color: #16a34a;
+      }
+      
+      .btn-success:hover {
+        background: #15803d;
+      }
+      
+      .stats {
+        display: flex;
+        gap: 1.5rem;
+        margin-top: 0.75rem;
+        font-size: 0.875rem;
+        color: #666;
+      }
+      
+      .container {
+        padding: 2rem;
+        max-width: 1600px;
+        margin: 0 auto;
+      }
+      
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+      }
+      
+      .palette-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        transition: all 0.2s;
+      }
+      
+      .palette-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      }
+      
+      .palette-card.hidden {
+        display: none;
+      }
+      
+      .palette-id {
+        font-size: 0.75rem;
+        color: #999;
+        margin-bottom: 0.5rem;
+        font-family: monospace;
+      }
+      
+      .palette-image {
+        width: 100%;
+        height: 240px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+      }
+      
+      .color-swatches {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+      
+      .swatch {
+        flex: 1;
+        height: 40px;
+        border-radius: 4px;
+        position: relative;
+        cursor: pointer;
+      }
+      
+      .swatch-label {
+        position: absolute;
+        bottom: 4px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 0.7rem;
+        font-family: monospace;
+        color: white;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+      }
+      
+      .suggestions-section {
+        margin-bottom: 0.75rem;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+      }
+      
+      .suggestions-label {
+        font-size: 0.75rem;
+        color: #666;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      
+      .suggestions-label svg {
+        width: 14px;
+        height: 14px;
+      }
+      
+      .categories {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      
+      .category-tag {
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        border: 1px solid #d0d0d0;
+        background: white;
+        transition: all 0.2s;
+      }
+      
+      .category-tag:hover {
+        background: #f0f0f0;
+      }
+      
+      .category-tag.suggested {
+        border-color: #93c5fd;
+        background: #eff6ff;
+        color: #1e40af;
+      }
+      
+      .category-tag.confirmed {
+        background: #16a34a;
+        color: white;
+        border-color: #16a34a;
+      }
+      
+      .category-tag.confirmed.suggested {
+        background: #059669;
+        border-color: #059669;
+      }
+      
+      .confirmed-section {
+        margin-top: 0.75rem;
+      }
+      
+      .confirmed-label {
+        font-size: 0.75rem;
+        color: #666;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+      }
+      
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 200;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .modal.active {
+        display: flex;
+      }
+      
+      .modal-content {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        max-width: 700px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+      }
+      
+      .modal h2 {
+        margin-bottom: 1rem;
+      }
+      
+      .modal textarea {
+        width: 100%;
+        height: 400px;
+        font-family: monospace;
+        font-size: 0.875rem;
+        padding: 1rem;
+        border: 1px solid #d0d0d0;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+      }
+      
+      .modal-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+      }
+      
+      .input-group {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+      
+      .input-group input {
+        flex: 1;
+        padding: 0.5rem;
+        border: 1px solid #d0d0d0;
+        border-radius: 6px;
+      }
+      
+      .empty-state {
+        text-align: center;
+        padding: 1rem;
+        color: #999;
+        font-size: 0.875rem;
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>🎨 Palette Curator</h1>
+      <div class="header-controls">
+        <div class="filter-group">
+          <label>Filter:</label>
+          <button class="category-filter active" data-filter="all">All ({allPalettes.length})</button>
+          {CATEGORIES.map(cat => (
+            <button class="category-filter" data-filter={cat.toLowerCase().replace(/\s+/g, '-')}>{cat}</button>
+          ))}
+          <button class="category-filter" data-filter="has-suggestions">Has Suggestions</button>
+          <button class="category-filter" data-filter="confirmed">Confirmed</button>
+          <button class="category-filter" data-filter="uncategorized">Uncategorized</button>
+        </div>
+        <div style="margin-left: auto; display: flex; gap: 0.5rem;">
+          <button class="btn" id="manageCategories">Add Custom Category</button>
+          <button class="btn btn-success" id="exportBtn">Export Selection</button>
+        </div>
+      </div>
+      <div class="stats">
+        <span id="totalCount">Total: {allPalettes.length}</span>
+        <span id="withSuggestions">With suggestions: {Object.keys(PALETTE_SUGGESTIONS).length}</span>
+        <span id="confirmedCount">Confirmed: 0</span>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="grid" id="paletteGrid">
+        {allPalettes.map((palette) => (
+          <div class="palette-card" data-id={palette.id} data-suggestions={JSON.stringify(palette.suggestions)}>
+            <div class="palette-id">img{palette.id}.jpg</div>
+            <img 
+              src={palette.imageUrl} 
+              alt={`Palette ${palette.id}`}
+              class="palette-image"
+              loading="lazy"
+            />
+            <div class="color-swatches">
+              {palette.colors.map((color) => (
+                <div class="swatch" style={`background-color: ${rgbToCss(color.rgb)}`}>
+                  <div class="swatch-label">{color.hex}</div>
+                </div>
+              ))}
+            </div>
+            
+            {palette.suggestions.length > 0 && (
+              <div class="suggestions-section">
+                <div class="suggestions-label">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                  Suggested ({palette.suggestions.length})
+                </div>
+                <div class="categories" data-palette-id={palette.id} data-type="suggestions">
+                  {palette.suggestions.map((cat) => (
+                    <button class="category-tag suggested" data-category={cat}>{cat}</button>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            <div class="confirmed-section">
+              <div class="confirmed-label">Click to confirm or add more:</div>
+              <div class="categories" data-palette-id={palette.id} data-type="all">
+                {CATEGORIES.map((cat) => (
+                  <button class="category-tag" data-category={cat}>{cat}</button>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="modal" id="exportModal">
+      <div class="modal-content">
+        <h2>Export Curated Selection</h2>
+        <p style="margin-bottom: 1rem; color: #666;">Copy this to <code>src/data/curatedPalettes.ts</code></p>
+        <textarea id="exportOutput" readonly></textarea>
+        <div class="modal-actions">
+          <button class="btn" onclick="document.getElementById('exportModal').classList.remove('active')">Close</button>
+          <button class="btn btn-primary" id="copyBtn">Copy to Clipboard</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="categoryModal">
+      <div class="modal-content">
+        <h2>Add Custom Category</h2>
+        <p style="margin-bottom: 1rem; color: #666; font-size: 0.875rem;">
+          The 20 default categories cover most scenes. Add custom ones only if you find recurring themes not covered.
+        </p>
+        <div class="input-group">
+          <input type="text" id="newCategoryInput" placeholder="e.g., Cityscape, Winter">
+          <button class="btn btn-primary" id="addCategoryBtn">Add</button>
+        </div>
+        <div id="categoryList" style="margin-bottom: 1rem;"></div>
+        <div class="modal-actions">
+          <button class="btn" onclick="document.getElementById('categoryModal').classList.remove('active')">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <script is:inline define:vars={{ paletteSuggestions: PALETTE_SUGGESTIONS, defaultCategories: CATEGORIES }}>
+      const STORAGE_KEY = 'imagehues_curator_v2';
+      const CUSTOM_CATEGORIES_KEY = 'imagehues_custom_categories_v2';
+      
+      let curatorData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      let customCategories = JSON.parse(localStorage.getItem(CUSTOM_CATEGORIES_KEY) || '[]');
+      
+      function saveCuratorData() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(curatorData));
+        updateStats();
+        updateFilterCounts();
+      }
+      
+      function saveCustomCategories() {
+        localStorage.setItem(CUSTOM_CATEGORIES_KEY, JSON.stringify(customCategories));
+      }
+      
+      function toggleCategory(paletteId, category) {
+        if (!curatorData[paletteId]) {
+          curatorData[paletteId] = { confirmed: [] };
+        }
+        
+        const confirmed = curatorData[paletteId].confirmed;
+        const index = confirmed.indexOf(category);
+        
+        if (index > -1) {
+          confirmed.splice(index, 1);
+        } else {
+          confirmed.push(category);
+        }
+        
+        saveCuratorData();
+        updateCardUI(paletteId);
+      }
+      
+      function updateCardUI(paletteId) {
+        const card = document.querySelector(`.palette-card[data-id="${paletteId}"]`);
+        if (!card) return;
+        
+        const allContainer = card.querySelector('.categories[data-type="all"]');
+        const buttons = allContainer.querySelectorAll('.category-tag');
+        
+        const confirmedCats = curatorData[paletteId]?.confirmed || [];
+        const suggestions = JSON.parse(card.dataset.suggestions || '[]');
+        
+        buttons.forEach(btn => {
+          const category = btn.dataset.category;
+          const isConfirmed = confirmedCats.includes(category);
+          const isSuggested = suggestions.includes(category);
+          
+          btn.classList.toggle('confirmed', isConfirmed);
+          btn.classList.toggle('suggested', isSuggested);
+        });
+      }
+      
+      function updateStats() {
+        const confirmedCount = Object.keys(curatorData).filter(id => 
+          curatorData[id].confirmed && curatorData[id].confirmed.length > 0
+        ).length;
+        
+        document.getElementById('confirmedCount').textContent = `Confirmed: ${confirmedCount}`;
+      }
+      
+      function updateFilterCounts() {
+        const filters = document.querySelectorAll('.category-filter');
+        filters.forEach(filter => {
+          const category = filter.dataset.filter;
+          if (category === 'all') return;
+          
+          let count = 0;
+          if (category === 'uncategorized') {
+            const allPaletteIds = Array.from(document.querySelectorAll('.palette-card')).map(c => c.dataset.id);
+            count = allPaletteIds.filter(id => 
+              !curatorData[id] || !curatorData[id].confirmed || curatorData[id].confirmed.length === 0
+            ).length;
+          } else if (category === 'has-suggestions') {
+            count = Object.keys(paletteSuggestions).length;
+          } else if (category === 'confirmed') {
+            count = Object.keys(curatorData).filter(id => 
+              curatorData[id].confirmed && curatorData[id].confirmed.length > 0
+            ).length;
+          } else {
+            const catName = category.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+            count = Object.values(curatorData).filter(p => 
+              p.confirmed && p.confirmed.includes(catName)
+            ).length;
+          }
+          
+          const currentText = filter.textContent.split(' (')[0];
+          filter.textContent = count > 0 ? `${currentText} (${count})` : currentText;
+        });
+      }
+      
+      function filterPalettes(filterValue) {
+        const cards = document.querySelectorAll('.palette-card');
+        
+        cards.forEach(card => {
+          const paletteId = card.dataset.id;
+          const confirmedCats = curatorData[paletteId]?.confirmed || [];
+          const suggestions = JSON.parse(card.dataset.suggestions || '[]');
+          
+          if (filterValue === 'all') {
+            card.classList.remove('hidden');
+          } else if (filterValue === 'uncategorized') {
+            card.classList.toggle('hidden', confirmedCats.length > 0);
+          } else if (filterValue === 'has-suggestions') {
+            card.classList.toggle('hidden', suggestions.length === 0);
+          } else if (filterValue === 'confirmed') {
+            card.classList.toggle('hidden', confirmedCats.length === 0);
+          } else {
+            const catName = filterValue.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+            card.classList.toggle('hidden', !confirmedCats.includes(catName));
+          }
+        });
+      }
+      
+      function addCustomCategory(name) {
+        const slug = name.toLowerCase().replace(/\s+/g, '-');
+        if (customCategories.find(c => c.slug === slug)) {
+          alert('Category already exists');
+          return;
+        }
+        
+        if (defaultCategories.includes(name)) {
+          alert('This is already a default category');
+          return;
+        }
+        
+        customCategories.push({ name, slug });
+        saveCustomCategories();
+        addCategoryToAllCards(name);
+        updateCategoryManagement();
+        
+        // Add filter button
+        const filterGroup = document.querySelector('.filter-group');
+        const btn = document.createElement('button');
+        btn.className = 'category-filter';
+        btn.dataset.filter = slug;
+        btn.textContent = name;
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.category-filter').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          filterPalettes(slug);
+        });
+        filterGroup.insertBefore(btn, filterGroup.querySelector('[data-filter="has-suggestions"]'));
+      }
+      
+      function addCategoryToAllCards(name) {
+        const cards = document.querySelectorAll('.palette-card');
+        cards.forEach(card => {
+          const container = card.querySelector('.categories[data-type="all"]');
+          const btn = document.createElement('button');
+          btn.className = 'category-tag';
+          btn.dataset.category = name;
+          btn.textContent = name;
+          btn.addEventListener('click', () => {
+            const paletteId = card.dataset.id;
+            toggleCategory(paletteId, name);
+          });
+          container.appendChild(btn);
+        });
+      }
+      
+      function updateCategoryManagement() {
+        const list = document.getElementById('categoryList');
+        list.innerHTML = '<h3 style="margin-bottom: 0.5rem; font-size: 0.875rem;">Custom Categories:</h3>';
+        
+        if (customCategories.length === 0) {
+          list.innerHTML += '<p style="color: #999; font-size: 0.875rem;">No custom categories yet.</p>';
+          return;
+        }
+        
+        customCategories.forEach((cat, index) => {
+          const div = document.createElement('div');
+          div.style.cssText = 'display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;';
+          div.innerHTML = `
+            <span style="flex: 1;">${cat.name}</span>
+            <button class="btn" onclick="removeCustomCategory(${index})">Remove</button>
+          `;
+          list.appendChild(div);
+        });
+      }
+      
+      window.removeCustomCategory = function(index) {
+        const category = customCategories[index];
+        if (!confirm(`Remove category "${category.name}"? This will remove it from all palettes.`)) return;
+        
+        // Remove from all palettes
+        Object.keys(curatorData).forEach(id => {
+          const confirmed = curatorData[id].confirmed;
+          const idx = confirmed.indexOf(category.name);
+          if (idx > -1) confirmed.splice(idx, 1);
+        });
+        
+        customCategories.splice(index, 1);
+        saveCustomCategories();
+        saveCuratorData();
+        
+        // Remove from UI
+        document.querySelectorAll(`[data-category="${category.name}"]`).forEach(el => el.remove());
+        document.querySelector(`[data-filter="${category.slug}"]`)?.remove();
+        
+        updateCategoryManagement();
+      };
+      
+      // Initialize
+      document.addEventListener('DOMContentLoaded', () => {
+        // Restore UI state
+        Object.keys(curatorData).forEach(id => updateCardUI(id));
+        updateStats();
+        updateFilterCounts();
+        
+        // Restore custom categories
+        customCategories.forEach(cat => {
+          addCategoryToAllCards(cat.name);
+          const filterGroup = document.querySelector('.filter-group');
+          const btn = document.createElement('button');
+          btn.className = 'category-filter';
+          btn.dataset.filter = cat.slug;
+          btn.textContent = cat.name;
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.category-filter').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            filterPalettes(cat.slug);
+          });
+          filterGroup.insertBefore(btn, filterGroup.querySelector('[data-filter="has-suggestions"]'));
+        });
+        
+        // Category button clicks
+        document.querySelectorAll('.category-tag').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const card = e.target.closest('.palette-card');
+            const paletteId = card.dataset.id;
+            const category = e.target.dataset.category;
+            toggleCategory(paletteId, category);
+          });
+        });
+        
+        // Filter buttons
+        document.querySelectorAll('.category-filter').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.category-filter').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            filterPalettes(btn.dataset.filter);
+          });
+        });
+        
+        // Export button
+        document.getElementById('exportBtn').addEventListener('click', () => {
+          const confirmed = Object.entries(curatorData)
+            .filter(([id, data]) => data.confirmed && data.confirmed.length > 0)
+            .sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
+          
+          const exported = confirmed.map(([id, data]) => ({
+            id,
+            categories: data.confirmed
+          }));
+          
+          const output = `// Curated palette selection - exported from /curate/
+// ${new Date().toISOString()}
+// ${exported.length} palettes selected
+
+export const CURATED_PALETTES: string[] = [
+${exported.map(p => `  '${p.id}', // ${p.categories.join(', ')}`).join('\n')}
+];
+
+// Category breakdown:
+${exported.map(p => `// ${p.id}: ${p.categories.join(', ')}`).join('\n')}
+`;
+          
+          document.getElementById('exportOutput').value = output;
+          document.getElementById('exportModal').classList.add('active');
+        });
+        
+        // Copy button
+        document.getElementById('copyBtn').addEventListener('click', () => {
+          const textarea = document.getElementById('exportOutput');
+          textarea.select();
+          document.execCommand('copy');
+          alert('Copied to clipboard!');
+        });
+        
+        // Manage categories
+        document.getElementById('manageCategories').addEventListener('click', () => {
+          updateCategoryManagement();
+          document.getElementById('categoryModal').classList.add('active');
+        });
+        
+        document.getElementById('addCategoryBtn').addEventListener('click', () => {
+          const input = document.getElementById('newCategoryInput');
+          const name = input.value.trim();
+          if (!name) return;
+          
+          addCustomCategory(name);
+          input.value = '';
+        });
+      });
+    </script>
+  </body>
+</html>

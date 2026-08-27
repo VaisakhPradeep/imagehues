@@ -1,0 +1,94 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import palettes from "../../../public/data/palettes.json";
+import { CURATED_PALETTES } from "../../data/curatedPalettes";
+
+const curatedPalettesData = CURATED_PALETTES.map((slug) => {
+  const imageUrl = `/unsplash_images/img${slug}.jpg`;
+  const colors = palettes[imageUrl];
+  
+  if (!colors) {
+    console.warn(`⚠️  Curated palette ${slug} not found in palettes.json`);
+    return null;
+  }
+  
+  return {
+    slug,
+    imageUrl,
+    colors,
+    hexCodes: colors.map(c => c.hex).join(', '),
+  };
+}).filter(Boolean);
+
+function rgbToCss(rgb: number[]) {
+  return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+}
+---
+
+<BaseLayout
+  title="Curated Color Palettes – Image Hues"
+  description="Browse our curated selection of natural color palettes extracted from beautiful photographs. Each palette features unique hex codes for designers and illustrators."
+  canonicalPath="/palettes/"
+>
+  <div class="mx-auto max-w-[1200px] px-6 py-24 max-lg:py-16 max-[480px]:px-4">
+    <div class="mb-12">
+      <h1 class="mb-4 font-sans text-[48px] leading-[56px] font-medium text-text-primary max-md:text-[36px] max-md:leading-[44px] max-[480px]:text-[28px] max-[480px]:leading-[36px]">
+        Curated Color Palettes
+      </h1>
+      <p class="text-lg text-text-secondary max-w-[700px]">
+        Hand-selected color palettes from beautiful photographs. Each palette tells a unique color story with distinctive hex combinations.
+      </p>
+    </div>
+
+    {curatedPalettesData.length === 0 ? (
+      <div class="rounded-lg bg-surface p-12 text-center shadow-card">
+        <p class="text-lg text-text-secondary mb-4">
+          Our curated palette collection is being prepared.
+        </p>
+        <p class="text-text-secondary">
+          Meanwhile, <a href="/" class="text-text-primary hover:underline">explore the full gallery</a> of color palettes.
+        </p>
+      </div>
+    ) : (
+      <div class="grid grid-cols-3 gap-6 max-lg:grid-cols-2 max-[480px]:grid-cols-1">
+        {curatedPalettesData.map((palette) => (
+          <a
+            href={`/palette/${palette.slug}/`}
+            class="group block rounded-[18px] bg-surface p-3 shadow-card transition-transform hover:scale-[1.02]"
+          >
+            <img
+              src={palette.imageUrl}
+              alt={`Color palette ${palette.hexCodes} from curated photograph`}
+              width="400"
+              height="300"
+              loading="lazy"
+              class="w-full rounded-[6px] mb-3"
+            />
+            <div class="flex gap-2 px-2">
+              {palette.colors.map((color) => (
+                <div class="flex-1">
+                  <div
+                    class="h-8 rounded"
+                    style={`background-color: ${rgbToCss(color.rgb)}`}
+                    title={color.hex}
+                  />
+                  <div class="mt-1 text-xs font-mono text-text-secondary text-center">
+                    {color.hex}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </a>
+        ))}
+      </div>
+    )}
+
+    <div class="mt-16 text-center">
+      <p class="text-text-secondary">
+        <a href="/" class="text-text-primary hover:underline">View all palettes</a>
+        {" · "}
+        <a href="/about/" class="text-text-primary hover:underline">About Image Hues</a>
+      </p>
+    </div>
+  </div>
+</BaseLayout>
