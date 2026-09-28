@@ -1,39 +1,152 @@
 {
-  "schemaVersion": 1,
-  "updatedAt": null,
-  "categories": {
-    "keep": [
-      "Sunset",
-      "Sunrise",
-      "Golden hour",
-      "Beach",
-      "Ocean",
-      "Forest",
-      "Autumn",
-      "Desert",
-      "Mountain",
-      "Tropical",
-      "Aurora"
-    ],
-    "stretch": [
-      "Canyon",
-      "Rainforest",
-      "Wildflower",
-      "Waterfall",
-      "Coral reef",
-      "Woodland",
-      "Fog",
-      "Dusk",
-      "Meadow"
-    ],
-    "publicV1": [
-      "Sunset",
-      "Beach",
-      "Forest",
-      "Desert",
-      "Tropical",
-      "Autumn"
-    ]
-  },
-  "picks": {}
+  "schemaVersion": 2,
+  "updatedAt": "2026-09-28T08:27:00Z",
+  "tagList": [
+    "Sunset",
+    "Autumn",
+    "Gold",
+    "Amber",
+    "Desert",
+    "Forest",
+    "Ocean",
+    "Teal",
+    "Clay",
+    "Cool grey",
+    "Dark",
+    "Moody",
+    "Mint",
+    "Ink",
+    "Purple",
+    "Magenta",
+    "Pink",
+    "Bold",
+    "Coral",
+    "Cream",
+    "Olive",
+    "Sand",
+    "High-contrast",
+    "Bright"
+  ],
+  "picks": {
+    "0": {
+      "tags": ["High-contrast", "Bright", "Gold", "Amber"],
+      "tier": "tag",
+      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "1": {
+      "tags": ["Cool grey", "Ocean"],
+      "tier": "tag",
+      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "2": {
+      "tags": ["Desert", "Cool grey"],
+      "tier": "tag",
+      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "3": {
+      "tags": ["Sunset"],
+      "tier": "public",
+      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "4": {
+      "tags": ["Teal", "Clay", "Dark", "Moody"],
+      "tier": "tag",
+      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "5": {
+      "tags": ["Autumn"],
+      "tier": "public",
+      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "6": {
+      "tags": ["Coral", "Cream", "Teal", "Clay"],
+      "tier": "tag",
+      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "7": {
+      "tags": ["Purple", "Magenta", "Dark", "Moody"],
+      "tier": "tag",
+      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "8": {
+      "tags": ["Forest", "Desert"],
+      "tier": "tag",
+      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "9": {
+      "tags": ["Gold", "Amber", "Teal", "Clay"],
+      "tier": "tag",
+      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "10": {
+      "tags": ["Sunset", "Gold", "Amber"],
+      "tier": "public-alt",
+      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "11": {
+      "tags": ["Ocean", "Cool grey"],
+      "tier": "tag",
+      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "12": {
+      "tags": ["Coral", "Cream", "Sunset"],
+      "tier": "tag",
+      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "13": {
+      "tags": ["Mint", "Ink", "Dark", "Moody"],
+      "tier": "tag",
+      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "14": {
+      "tags": ["Desert", "Cool grey"],
+      "tier": "tag",
+      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "15": {
+      "tags": ["Sunset", "Gold", "Amber"],
+      "tier": "public-alt",
+      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "16": {
+      "tags": ["Pink", "Bold", "Ocean"],
+      "tier": "tag",
+      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "17": {
+      "tags": ["Ocean", "Dark", "Moody"],
+      "tier": "tag",
+      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "18": {
+      "tags": ["Teal", "Clay", "Dark", "Moody"],
+      "tier": "tag",
+      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "19": {
+      "tags": ["Olive", "Sand", "Desert"],
+      "tier": "tag",
+      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedBy": "vaisakh"
+    }
+  }
 }
