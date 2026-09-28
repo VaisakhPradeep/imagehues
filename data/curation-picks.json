@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-09-28T08:27:00Z",
+  "updatedAt": "2026-09-28T08:34:00Z",
   "tagList": {
     "hue": [
       "Sunset",
@@ -38,123 +38,123 @@
   },
   "picks": {
     "0": {
-      "tags": ["High-contrast", "Bright", "Gold", "Amber"],
+      "tags": ["Gold", "High-contrast", "Bright"],
       "tier": "tag",
-      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedAt": "2026-09-28T08:34:00Z",
       "lockedBy": "vaisakh"
     },
     "1": {
-      "tags": ["Cool grey", "Ocean"],
+      "tags": ["Cool grey", "Ocean", "Muted"],
       "tier": "tag",
-      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedAt": "2026-09-28T08:34:00Z",
       "lockedBy": "vaisakh"
     },
     "2": {
-      "tags": ["Desert", "Cool grey"],
+      "tags": ["Desert", "Cool grey", "Muted", "Soft"],
       "tier": "tag",
-      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedAt": "2026-09-28T08:34:00Z",
       "lockedBy": "vaisakh"
     },
     "3": {
-      "tags": ["Sunset"],
+      "tags": ["Sunset", "Dark", "High-contrast"],
       "tier": "public",
-      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedAt": "2026-09-28T08:34:00Z",
       "lockedBy": "vaisakh"
     },
     "4": {
-      "tags": ["Teal", "Clay", "Dark", "Moody"],
+      "tags": ["Teal", "Clay", "Dark"],
       "tier": "tag",
-      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedAt": "2026-09-28T08:34:00Z",
       "lockedBy": "vaisakh"
     },
     "5": {
-      "tags": ["Autumn"],
+      "tags": ["Autumn", "Soft", "Muted"],
       "tier": "public",
-      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedAt": "2026-09-28T08:34:00Z",
       "lockedBy": "vaisakh"
     },
     "6": {
-      "tags": ["Coral", "Cream", "Teal", "Clay"],
+      "tags": ["Coral", "Cream", "Teal", "Clay", "Soft"],
       "tier": "tag",
-      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedAt": "2026-09-28T08:34:00Z",
       "lockedBy": "vaisakh"
     },
     "7": {
       "tags": ["Purple", "Magenta", "Dark", "Moody"],
       "tier": "tag",
-      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedAt": "2026-09-28T08:34:00Z",
       "lockedBy": "vaisakh"
     },
     "8": {
-      "tags": ["Forest", "Desert"],
+      "tags": ["Forest", "Desert", "Muted"],
       "tier": "tag",
-      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedAt": "2026-09-28T08:34:00Z",
       "lockedBy": "vaisakh"
     },
     "9": {
       "tags": ["Gold", "Amber", "Teal", "Clay"],
       "tier": "tag",
-      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedAt": "2026-09-28T08:34:00Z",
       "lockedBy": "vaisakh"
     },
     "10": {
-      "tags": ["Sunset", "Gold", "Amber"],
+      "tags": ["Sunset", "Gold", "Amber", "Bright", "Bold"],
       "tier": "public-alt",
-      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedAt": "2026-09-28T08:34:00Z",
       "lockedBy": "vaisakh"
     },
     "11": {
-      "tags": ["Ocean", "Cool grey"],
+      "tags": ["Ocean", "Cool grey", "Soft"],
       "tier": "tag",
-      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedAt": "2026-09-28T08:34:00Z",
       "lockedBy": "vaisakh"
     },
     "12": {
-      "tags": ["Coral", "Cream", "Sunset"],
+      "tags": ["Coral", "Cream", "Sunset", "Soft", "Minimal"],
       "tier": "tag",
-      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedAt": "2026-09-28T08:34:00Z",
       "lockedBy": "vaisakh"
     },
     "13": {
       "tags": ["Mint", "Ink", "Dark", "Moody"],
       "tier": "tag",
-      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedAt": "2026-09-28T08:34:00Z",
       "lockedBy": "vaisakh"
     },
     "14": {
-      "tags": ["Desert", "Cool grey"],
+      "tags": ["Desert", "Cool grey", "Muted"],
       "tier": "tag",
-      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedAt": "2026-09-28T08:34:00Z",
       "lockedBy": "vaisakh"
     },
     "15": {
-      "tags": ["Sunset", "Gold", "Amber"],
+      "tags": ["Sunset", "Gold", "Amber", "Bold"],
       "tier": "public-alt",
-      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedAt": "2026-09-28T08:34:00Z",
       "lockedBy": "vaisakh"
     },
     "16": {
-      "tags": ["Pink", "Bold", "Ocean"],
+      "tags": ["Pink", "Bold"],
       "tier": "tag",
-      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedAt": "2026-09-28T08:34:00Z",
       "lockedBy": "vaisakh"
     },
     "17": {
       "tags": ["Ocean", "Dark", "Moody"],
       "tier": "tag",
-      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedAt": "2026-09-28T08:34:00Z",
       "lockedBy": "vaisakh"
     },
     "18": {
       "tags": ["Teal", "Clay", "Dark", "Moody"],
       "tier": "tag",
-      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedAt": "2026-09-28T08:34:00Z",
       "lockedBy": "vaisakh"
     },
     "19": {
-      "tags": ["Olive", "Sand", "Desert"],
+      "tags": ["Olive", "Sand", "Desert", "Soft", "Muted"],
       "tier": "tag",
-      "lockedAt": "2026-09-28T08:27:00Z",
+      "lockedAt": "2026-09-28T08:34:00Z",
       "lockedBy": "vaisakh"
     }
   }
