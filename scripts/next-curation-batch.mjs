@@ -30,6 +30,10 @@ const lockedIds = new Set(Object.keys(picksData.picks));
 const suggestionsPath = join(ROOT, 'data', 'palette-suggestions.json');
 const suggestions = JSON.parse(readFileSync(suggestionsPath, 'utf-8'));
 
+// Load palette hexes
+const palettesPath = join(ROOT, 'public', 'data', 'palettes.json');
+const palettesData = JSON.parse(readFileSync(palettesPath, 'utf-8'));
+
 // Enumerate all images in public/unsplash_images/
 const imagesDir = join(ROOT, 'public', 'unsplash_images');
 const files = readdirSync(imagesDir);
@@ -51,12 +55,19 @@ const uncuratedIds = imageIds.filter(id => !lockedIds.has(String(id)));
 const nextBatch = uncuratedIds.slice(0, count);
 
 // Build output
-const batch = nextBatch.map(id => ({
-  id: String(id),
-  filename: `img${id}.jpg`,
-  url: `https://raw.githubusercontent.com/VaisakhPradeep/imagehues/main/public/unsplash_images/img${id}.jpg`,
-  suggested: suggestions[String(id)] || []
-}));
+const batch = nextBatch.map(id => {
+  const paletteKey = `/unsplash_images/img${id}.jpg`;
+  const paletteColors = palettesData[paletteKey] || [];
+  const hexes = paletteColors.map(c => c.hex);
+  
+  return {
+    id: String(id),
+    filename: `img${id}.jpg`,
+    url: `https://raw.githubusercontent.com/VaisakhPradeep/imagehues/main/public/unsplash_images/img${id}.jpg`,
+    suggested: suggestions[String(id)] || [],
+    palette: hexes
+  };
+});
 
 // Output in requested format
 if (format === 'markdown') {
@@ -67,6 +78,10 @@ if (format === 'markdown') {
       ? item.suggested.join(', ') 
       : '(none)';
     console.log(`Suggested: ${suggested}`);
+    const paletteStr = item.palette.length > 0
+      ? item.palette.join(' · ')
+      : '(none)';
+    console.log(`Palette: ${paletteStr}`);
     console.log('');
   }
 } else {

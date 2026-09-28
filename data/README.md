@@ -64,6 +64,7 @@ The script:
 - Excludes already-curated images (IDs in `curation-picks.json` picks)
 - Returns the first N uncurated images
 - Attaches vision-based suggestions when available
+- Includes extracted palette hexes (4 colors per image)
 - Uses stable `raw.githubusercontent.com` URLs on main branch
 
 ### Lock Curation Decisions
