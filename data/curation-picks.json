@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": null,
+  "categories": {
+    "keep": [
+      "Sunset",
+      "Sunrise",
+      "Golden hour",
+      "Beach",
+      "Ocean",
+      "Forest",
+      "Autumn",
+      "Desert",
+      "Mountain",
+      "Tropical",
+      "Aurora"
+    ],
+    "stretch": [
+      "Canyon",
+      "Rainforest",
+      "Wildflower",
+      "Waterfall",
+      "Coral reef",
+      "Woodland",
+      "Fog",
+      "Dusk",
+      "Meadow"
+    ],
+    "publicV1": [
+      "Sunset",
+      "Beach",
+      "Forest",
+      "Desert",
+      "Tropical",
+      "Autumn"
+    ]
+  },
+  "picks": {}
+}

@@ -1,0 +1,116 @@
+# Daily Image Curation
+
+This directory contains infrastructure for daily image curation workflow.
+
+## Files
+
+### `curation-picks.json`
+Locked curation decisions. Each pick includes:
+- `categories`: Array of scene categories (e.g., `["Ocean", "Beach"]`)
+- `lockedAt`: ISO-8601 timestamp
+- `lockedBy`: Curator name (e.g., `"vaisakh"`)
+
+**Example entry:**
+```json
+{
+  "picks": {
+    "42": {
+      "categories": ["Sunset", "Beach"],
+      "lockedAt": "2026-09-28T10:30:00Z",
+      "lockedBy": "vaisakh"
+    }
+  }
+}
+```
+
+### `palette-suggestions.json`
+Vision-based scene category suggestions imported from PR 15 (cursor/palette-seo-urls-6fcb).
+Maps image ID to suggested categories.
+
+**Format:**
+```json
+{
+  "5": ["Autumn", "Fog"],
+  "13": ["Aurora", "Mountain"]
+}
+```
+
+### Category Lists
+Three category tiers defined in `curation-picks.json`:
+- **keep**: 11 core categories for primary navigation
+- **stretch**: 9 additional categories for expanded coverage
+- **publicV1**: 6 categories for initial public launch
+
+## Workflow
+
+### Get Next Batch for Curation
+Run the script to get the next 20 (or custom count) uncurated images:
+
+```bash
+# JSON output (default)
+node scripts/next-curation-batch.mjs
+
+# Custom count
+node scripts/next-curation-batch.mjs --count=50
+
+# Markdown format for chat (includes image previews)
+node scripts/next-curation-batch.mjs --format=markdown
+node scripts/next-curation-batch.mjs --count=20 --format=markdown
+```
+
+The script:
+- Enumerates all JPEGs in `public/unsplash_images/`
+- Sorts numerically by image ID
+- Excludes already-curated images (IDs in `curation-picks.json` picks)
+- Returns the first N uncurated images
+- Attaches vision-based suggestions when available
+- Uses stable `raw.githubusercontent.com` URLs on main branch
+
+### Lock Curation Decisions
+After QC in chat, manually edit `curation-picks.json` to add picks:
+
+```json
+{
+  "picks": {
+    "42": {
+      "categories": ["Sunset", "Beach"],
+      "lockedAt": "2026-09-28T10:30:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "43": {
+      "categories": ["Forest"],
+      "lockedAt": "2026-09-28T10:31:00Z",
+      "lockedBy": "vaisakh"
+    }
+  }
+}
+```
+
+Update the `updatedAt` timestamp at the top level when saving changes.
+
+### Future: Automation Script
+A future `scripts/lock-picks.mjs` could streamline locking:
+```bash
+node scripts/lock-picks.mjs --id=42 --categories="Sunset,Beach" --by=vaisakh
+```
+
+## Data Flow
+
+1. **eevee** runs `next-curation-batch.mjs` → gets next 20 images with suggestions
+2. **Vaisakh** reviews in chat → QCs categories for each image
+3. **Manual edit** of `curation-picks.json` → locks decisions
+4. **Repeat** → Next run of script skips locked images
+
+## Progress Tracking
+
+Check remaining uncurated images:
+```bash
+# Total images
+ls public/unsplash_images/*.jpg | wc -l
+
+# Already curated (count picks in JSON)
+cat data/curation-picks.json | grep -c '"categories"'
+
+# Or run the script with large count to see what's left
+node scripts/next-curation-batch.mjs --count=9999 | grep -c '"id"'
+```
