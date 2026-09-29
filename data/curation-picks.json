@@ -18,6 +18,7 @@
       "Purple",
       "Magenta",
       "Pink",
+      "Red",
       "Coral",
       "Cream",
       "Olive",
@@ -204,7 +205,7 @@
       "lockedBy": "vaisakh"
     },
     "27": {
-      "tags": ["Pink", "Cream", "Sand", "Bold", "High-contrast", "Vibrant"],
+      "tags": ["Red", "Cream", "Sand", "Bold", "High-contrast", "Vibrant"],
       "tier": "tag",
       "lockedAt": "2026-09-29T04:20:00Z",
       "lockedBy": "vaisakh"
