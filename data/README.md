@@ -66,13 +66,13 @@ Two separate tag axes defined in `curation-picks.json` → `tagList`:
 Color and neutral descriptors:
 **Sunset, Autumn, Gold, Amber, Desert, Forest, Ocean, Teal, Clay, Cool grey, Mint, Ink, Purple, Magenta, Pink, Coral, Cream, Olive, Sand**
 
-#### Mood Tags (10)
-Atmosphere and style descriptors (frozen by sio/fig):
-**Bold, Soft, Moody, Minimal, Warm, Cool, Dark, Bright, High-contrast, Muted**
+#### Mood Tags (14)
+Atmosphere and style descriptors:
+**Bold, Soft, Moody, Minimal, Warm, Cool, Dark, Bright, High-contrast, Muted, Vibrant, Calm, Dramatic, Earthy**
 
 #### Tagging Guidelines
 - **Mix axes:** Combine hue + mood tags (e.g., `["Teal", "Clay", "Dark", "Moody"]`)
-- **0-2 moods per image** alongside hue tags
+- **0-3 moods per image** alongside hue tags
 - **Order matters:** First tag = primary for title generation
 - **Title pattern:** Primary hue + hexes (e.g., "Sunset Palette #ff8c42...")
 - **Mood in titles:** Only as secondary phrase when it strengthens the query
@@ -139,7 +139,7 @@ After QC in chat, manually edit `curation-picks.json` to add picks:
 
 **Tag Guidelines:**
 - Use atomic tags only (e.g., `["Pink", "Bold"]` NOT `["Pink & bold"]`)
-- Mix hue + mood tags (0-2 moods per image)
+- Mix hue + mood tags (0-3 moods per image)
 - Order matters: first tag = primary for titles
 - Choose appropriate tier: `public` (main indexed pages), `public-alt` (next launch), `tag` (filter only)
 - Warm/Cool mood: only when palette temperature contrasts the hue

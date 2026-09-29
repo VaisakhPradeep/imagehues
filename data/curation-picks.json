@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-09-28T08:34:00Z",
+  "updatedAt": "2026-09-29T04:20:00Z",
   "tagList": {
     "hue": [
       "Sunset",
@@ -33,7 +33,11 @@
       "Dark",
       "Bright",
       "High-contrast",
-      "Muted"
+      "Muted",
+      "Vibrant",
+      "Calm",
+      "Dramatic",
+      "Earthy"
     ]
   },
   "picks": {
@@ -155,6 +159,126 @@
       "tags": ["Olive", "Sand", "Desert", "Soft", "Muted"],
       "tier": "tag",
       "lockedAt": "2026-09-28T08:34:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "20": {
+      "tags": ["Coral", "Cream", "Olive", "Soft", "Muted"],
+      "tier": "tag",
+      "lockedAt": "2026-09-29T04:20:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "21": {
+      "tags": ["Gold", "Ocean", "Cool grey", "High-contrast"],
+      "tier": "tag",
+      "lockedAt": "2026-09-29T04:20:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "22": {
+      "tags": ["Desert", "Clay", "Dark", "Minimal"],
+      "tier": "tag",
+      "lockedAt": "2026-09-29T04:20:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "23": {
+      "tags": ["Teal", "Coral", "Ink", "Dark", "High-contrast", "Dramatic"],
+      "tier": "public-alt",
+      "lockedAt": "2026-09-29T04:20:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "24": {
+      "tags": ["Gold", "Coral", "Bold", "High-contrast"],
+      "tier": "tag",
+      "lockedAt": "2026-09-29T04:20:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "25": {
+      "tags": ["Ocean", "Cool grey", "Ink", "Dark", "Moody", "Dramatic"],
+      "tier": "tag",
+      "lockedAt": "2026-09-29T04:20:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "26": {
+      "tags": ["Desert", "Ink", "Dark", "Minimal", "Calm"],
+      "tier": "tag",
+      "lockedAt": "2026-09-29T04:20:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "27": {
+      "tags": ["Pink", "Cream", "Sand", "Bold", "High-contrast", "Vibrant"],
+      "tier": "tag",
+      "lockedAt": "2026-09-29T04:20:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "28": {
+      "tags": ["Forest", "Desert", "Dark", "Muted", "Earthy"],
+      "tier": "tag",
+      "lockedAt": "2026-09-29T04:20:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "29": {
+      "tags": ["Olive", "Amber", "Bright", "Bold"],
+      "tier": "tag",
+      "lockedAt": "2026-09-29T04:20:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "30": {
+      "tags": ["Autumn", "Clay", "Soft", "Muted", "Earthy"],
+      "tier": "public",
+      "lockedAt": "2026-09-29T04:20:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "31": {
+      "tags": ["Cream", "Ink", "Clay", "Dark", "Minimal"],
+      "tier": "tag",
+      "lockedAt": "2026-09-29T04:20:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "32": {
+      "tags": ["Teal", "Amber", "Bright", "Bold", "Vibrant"],
+      "tier": "tag",
+      "lockedAt": "2026-09-29T04:20:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "33": {
+      "tags": ["Sunset", "Gold", "Amber", "Bright", "Bold", "Vibrant"],
+      "tier": "public",
+      "lockedAt": "2026-09-29T04:20:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "34": {
+      "tags": ["Clay", "Cool grey", "Soft", "Minimal", "Calm"],
+      "tier": "tag",
+      "lockedAt": "2026-09-29T04:20:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "35": {
+      "tags": ["Gold", "Ink", "Bright", "Bold"],
+      "tier": "tag",
+      "lockedAt": "2026-09-29T04:20:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "36": {
+      "tags": ["Coral", "Cool grey", "Bold", "Soft"],
+      "tier": "tag",
+      "lockedAt": "2026-09-29T04:20:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "37": {
+      "tags": ["Clay", "Amber", "Bold", "High-contrast"],
+      "tier": "tag",
+      "lockedAt": "2026-09-29T04:20:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "38": {
+      "tags": ["Mint", "Sand", "Soft", "Calm"],
+      "tier": "tag",
+      "lockedAt": "2026-09-29T04:20:00Z",
+      "lockedBy": "vaisakh"
+    },
+    "39": {
+      "tags": ["Cool grey", "Ink", "Dark", "High-contrast", "Dramatic"],
+      "tier": "tag",
+      "lockedAt": "2026-09-29T04:20:00Z",
       "lockedBy": "vaisakh"
     }
   }
