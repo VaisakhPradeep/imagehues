@@ -1,5 +1,5 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
 
 const id = 60;
 const primaryHue = "Rust";
@@ -25,7 +25,7 @@ function rgbToCss(rgb: number[]) {
       <h1
         class="mb-8 font-sans text-[48px] leading-[56px] font-medium text-text-primary max-md:text-[36px] max-md:leading-[44px] max-[480px]:text-[28px] max-[480px]:leading-[36px]"
       >
-        Rust color palette — #dc783e #c9c7c5 #16160f #4e4b18 | ImageHues
+        Rust color palette
       </h1>
 
       <div class="mx-auto max-w-[800px]">
@@ -41,39 +41,20 @@ function rgbToCss(rgb: number[]) {
             decoding="async"
             class="w-full rounded-[6px]"
           />
-          <div class="color-panel flex items-center justify-between px-[30px] py-4 max-[480px]:p-4">
+          <div class="color-panel flex items-center justify-center gap-8 px-8 py-6 max-[480px]:gap-4 max-[480px]:px-4 max-[480px]:py-4">
             {palette.map((color) => (
-              <div
-                class="color group/color relative h-6 w-6 animate-scale cursor-pointer rounded-full bg-background max-[480px]:h-[20px] max-[480px]:w-[20px]"
-                style={`background-color: ${rgbToCss(color.rgb)}`}
-                onclick="onColorClick(event)"
-              >
-                <div class="tooltip absolute -bottom-[35px] z-[100] hidden rounded bg-text-primary text-text-inverse group-hover/color:block">
-                  <span>{color.hex}</span>
+              <div class="flex flex-col items-center gap-2">
+                <div
+                  class="color h-12 w-12 cursor-pointer rounded-full shadow-md transition-transform hover:scale-110 max-[480px]:h-10 max-[480px]:w-10"
+                  style={`background-color: ${rgbToCss(color.rgb)}`}
+                  onclick="onColorClick(event)"
+                  data-hex={color.hex}
+                >
                 </div>
+                <span class="text-sm font-mono text-text-secondary">{color.hex}</span>
               </div>
             ))}
           </div>
-        </div>
-
-        <div class="mt-8">
-          <h2 class="mb-4 text-[24px] font-medium text-text-primary">Color Tags</h2>
-          <div class="flex flex-wrap gap-2">
-            {tags.map((tag) => (
-              <span class="rounded-full bg-surface px-4 py-2 text-sm text-text-secondary">
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        <div class="mt-8">
-          <a
-            href="/"
-            class="inline-block rounded-lg bg-surface px-6 py-3 text-text-primary no-underline transition-opacity hover:opacity-80"
-          >
-            ← Back to all palettes
-          </a>
         </div>
       </div>
     </div>
@@ -82,14 +63,13 @@ function rgbToCss(rgb: number[]) {
 
 <script is:inline>
   function onColorClick(event) {
-    const hex = event.currentTarget.querySelector('.tooltip span').textContent;
+    const hex = event.currentTarget.getAttribute('data-hex');
     navigator.clipboard.writeText(hex);
     
-    const tooltip = event.currentTarget.querySelector('.tooltip');
-    const originalText = tooltip.textContent;
-    tooltip.textContent = 'Copied!';
+    const originalBg = event.currentTarget.style.backgroundColor;
+    event.currentTarget.style.transform = 'scale(1.2)';
     setTimeout(() => {
-      tooltip.textContent = originalText;
-    }, 1000);
+      event.currentTarget.style.transform = 'scale(1)';
+    }, 200);
   }
 </script>
