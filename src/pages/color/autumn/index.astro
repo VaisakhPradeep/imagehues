@@ -1,0 +1,193 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+
+const primaryHue = "Autumn";
+
+const publicPalettes = [
+  {
+    "id": 5,
+    "imageUrl": "/unsplash_images/img5.jpg",
+    "palette": [
+      {
+        "rgb": [
+          239,
+          156,
+          102
+        ],
+        "hex": "#ef9c66"
+      },
+      {
+        "rgb": [
+          242,
+          236,
+          231
+        ],
+        "hex": "#f2ece7"
+      },
+      {
+        "rgb": [
+          76,
+          67,
+          57
+        ],
+        "hex": "#4c4339"
+      },
+      {
+        "rgb": [
+          244,
+          182,
+          140
+        ],
+        "hex": "#f4b68c"
+      }
+    ],
+    "tags": [
+      "Autumn",
+      "Soft",
+      "Muted"
+    ],
+    "tier": "public",
+    "primaryHue": "Autumn"
+  },
+  {
+    "id": 30,
+    "imageUrl": "/unsplash_images/img30.jpg",
+    "palette": [
+      {
+        "rgb": [
+          178,
+          119,
+          61
+        ],
+        "hex": "#b2773d"
+      },
+      {
+        "rgb": [
+          200,
+          201,
+          199
+        ],
+        "hex": "#c8c9c7"
+      },
+      {
+        "rgb": [
+          55,
+          63,
+          58
+        ],
+        "hex": "#373f3a"
+      },
+      {
+        "rgb": [
+          140,
+          39,
+          41
+        ],
+        "hex": "#8c2729"
+      }
+    ],
+    "tags": [
+      "Autumn",
+      "Clay",
+      "Soft",
+      "Muted",
+      "Earthy"
+    ],
+    "tier": "public",
+    "primaryHue": "Autumn"
+  }
+];
+const altPalettes = [];
+
+function rgbToCss(rgb: number[]) {
+  return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+}
+---
+
+<BaseLayout
+  title="Autumn color palette | ImageHues"
+  description="Explore 2 autumn color palettes from curated photos. Click to copy hex codes."
+  canonicalPath="/color/autumn/"
+  skipJsonLd={true}
+>
+  <div class="mx-auto max-w-[1200px] px-6 max-[480px]:px-4">
+    <div class="py-16 max-lg:py-12">
+      <h1
+        class="mb-8 font-sans text-[48px] leading-[56px] font-medium text-text-primary max-md:text-[36px] max-md:leading-[44px] max-[480px]:text-[28px] max-[480px]:leading-[36px]"
+      >
+        Autumn color palette
+      </h1>
+
+      <div class="mx-auto grid max-w-none grid-cols-2 gap-6 max-md:grid-cols-1">
+        {
+          publicPalettes.map((data) => (
+            <a
+              href={`/palette/${data.id}/`}
+              class="group relative m-0 w-auto rounded-[18px] bg-surface p-2.5 shadow-card no-underline transition-transform hover:scale-[1.02]"
+            >
+              <img
+                src={data.imageUrl}
+                alt={`${primaryHue} color palette from curated photo`}
+                width="800"
+                height="600"
+                loading="eager"
+                decoding="async"
+                class="w-full rounded-[6px]"
+              />
+              <div class="color-panel flex items-center justify-center gap-8 px-8 py-6 max-[480px]:gap-4 max-[480px]:px-4 max-[480px]:py-4">
+                {data.palette.map((color) => (
+                  <div class="flex flex-col items-center gap-2">
+                    <div
+                      class="color h-12 w-12 rounded-full shadow-md max-[480px]:h-10 max-[480px]:w-10"
+                      style={`background-color: ${rgbToCss(color.rgb)}`}
+                    >
+                    </div>
+                    <span class="text-sm font-mono text-text-secondary">{color.hex}</span>
+                  </div>
+                ))}
+              </div>
+            </a>
+          ))
+        }
+      </div>
+
+      {altPalettes.length > 0 && (
+        <div class="mt-12">
+          <h2 class="mb-6 text-2xl font-medium text-text-secondary">More like this</h2>
+          <div class="mx-auto grid max-w-none grid-cols-2 gap-6 max-md:grid-cols-1">
+            {
+              altPalettes.map((data) => (
+                <a
+                  href={`/palette/${data.id}/`}
+                  class="group relative m-0 w-auto rounded-[18px] bg-surface p-2.5 shadow-card no-underline transition-transform hover:scale-[1.02]"
+                >
+                  <img
+                    src={data.imageUrl}
+                    alt={`${primaryHue} color palette from curated photo`}
+                    width="800"
+                    height="600"
+                    loading="eager"
+                    decoding="async"
+                    class="w-full rounded-[6px]"
+                  />
+                  <div class="color-panel flex items-center justify-center gap-8 px-8 py-6 max-[480px]:gap-4 max-[480px]:px-4 max-[480px]:py-4">
+                    {data.palette.map((color) => (
+                      <div class="flex flex-col items-center gap-2">
+                        <div
+                          class="color h-12 w-12 rounded-full shadow-md max-[480px]:h-10 max-[480px]:w-10"
+                          style={`background-color: ${rgbToCss(color.rgb)}`}
+                        >
+                        </div>
+                        <span class="text-sm font-mono text-text-secondary">{color.hex}</span>
+                      </div>
+                    ))}
+                  </div>
+                </a>
+              ))
+            }
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+</BaseLayout>

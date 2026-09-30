@@ -1,0 +1,288 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+
+const primaryHue = "Sunset";
+
+const publicPalettes = [
+  {
+    "id": 3,
+    "imageUrl": "/unsplash_images/img3.jpg",
+    "palette": [
+      {
+        "rgb": [
+          217,
+          101,
+          60
+        ],
+        "hex": "#d9653c"
+      },
+      {
+        "rgb": [
+          16,
+          7,
+          5
+        ],
+        "hex": "#100705"
+      },
+      {
+        "rgb": [
+          58,
+          45,
+          54
+        ],
+        "hex": "#3a2d36"
+      },
+      {
+        "rgb": [
+          38,
+          26,
+          34
+        ],
+        "hex": "#261a22"
+      }
+    ],
+    "tags": [
+      "Sunset",
+      "Dark",
+      "High-contrast"
+    ],
+    "tier": "public",
+    "primaryHue": "Sunset"
+  },
+  {
+    "id": 33,
+    "imageUrl": "/unsplash_images/img33.jpg",
+    "palette": [
+      {
+        "rgb": [
+          254,
+          121,
+          2
+        ],
+        "hex": "#fe7902"
+      },
+      {
+        "rgb": [
+          254,
+          253,
+          242
+        ],
+        "hex": "#fefdf2"
+      },
+      {
+        "rgb": [
+          19,
+          2,
+          1
+        ],
+        "hex": "#130201"
+      },
+      {
+        "rgb": [
+          255,
+          245,
+          16
+        ],
+        "hex": "#fff510"
+      }
+    ],
+    "tags": [
+      "Sunset",
+      "Gold",
+      "Amber",
+      "Bright",
+      "Bold",
+      "Vibrant"
+    ],
+    "tier": "public",
+    "primaryHue": "Sunset"
+  }
+];
+const altPalettes = [
+  {
+    "id": 10,
+    "imageUrl": "/unsplash_images/img10.jpg",
+    "palette": [
+      {
+        "rgb": [
+          236,
+          96,
+          44
+        ],
+        "hex": "#ec602c"
+      },
+      {
+        "rgb": [
+          217,
+          224,
+          217
+        ],
+        "hex": "#d9e0d9"
+      },
+      {
+        "rgb": [
+          41,
+          57,
+          57
+        ],
+        "hex": "#293939"
+      },
+      {
+        "rgb": [
+          252,
+          217,
+          101
+        ],
+        "hex": "#fcd965"
+      }
+    ],
+    "tags": [
+      "Sunset",
+      "Gold",
+      "Amber",
+      "Bright",
+      "Bold"
+    ],
+    "tier": "public-alt",
+    "primaryHue": "Sunset"
+  },
+  {
+    "id": 15,
+    "imageUrl": "/unsplash_images/img15.jpg",
+    "palette": [
+      {
+        "rgb": [
+          223,
+          153,
+          42
+        ],
+        "hex": "#df992a"
+      },
+      {
+        "rgb": [
+          204,
+          214,
+          218
+        ],
+        "hex": "#ccd6da"
+      },
+      {
+        "rgb": [
+          16,
+          18,
+          14
+        ],
+        "hex": "#10120e"
+      },
+      {
+        "rgb": [
+          160,
+          18,
+          28
+        ],
+        "hex": "#a0121c"
+      }
+    ],
+    "tags": [
+      "Sunset",
+      "Gold",
+      "Amber",
+      "Bold"
+    ],
+    "tier": "public-alt",
+    "primaryHue": "Sunset"
+  }
+];
+
+function rgbToCss(rgb: number[]) {
+  return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+}
+---
+
+<BaseLayout
+  title="Sunset color palette | ImageHues"
+  description="Explore 2 sunset color palettes from curated photos. Click to copy hex codes."
+  canonicalPath="/color/sunset/"
+  skipJsonLd={true}
+>
+  <div class="mx-auto max-w-[1200px] px-6 max-[480px]:px-4">
+    <div class="py-16 max-lg:py-12">
+      <h1
+        class="mb-8 font-sans text-[48px] leading-[56px] font-medium text-text-primary max-md:text-[36px] max-md:leading-[44px] max-[480px]:text-[28px] max-[480px]:leading-[36px]"
+      >
+        Sunset color palette
+      </h1>
+
+      <div class="mx-auto grid max-w-none grid-cols-2 gap-6 max-md:grid-cols-1">
+        {
+          publicPalettes.map((data) => (
+            <a
+              href={`/palette/${data.id}/`}
+              class="group relative m-0 w-auto rounded-[18px] bg-surface p-2.5 shadow-card no-underline transition-transform hover:scale-[1.02]"
+            >
+              <img
+                src={data.imageUrl}
+                alt={`${primaryHue} color palette from curated photo`}
+                width="800"
+                height="600"
+                loading="eager"
+                decoding="async"
+                class="w-full rounded-[6px]"
+              />
+              <div class="color-panel flex items-center justify-center gap-8 px-8 py-6 max-[480px]:gap-4 max-[480px]:px-4 max-[480px]:py-4">
+                {data.palette.map((color) => (
+                  <div class="flex flex-col items-center gap-2">
+                    <div
+                      class="color h-12 w-12 rounded-full shadow-md max-[480px]:h-10 max-[480px]:w-10"
+                      style={`background-color: ${rgbToCss(color.rgb)}`}
+                    >
+                    </div>
+                    <span class="text-sm font-mono text-text-secondary">{color.hex}</span>
+                  </div>
+                ))}
+              </div>
+            </a>
+          ))
+        }
+      </div>
+
+      {altPalettes.length > 0 && (
+        <div class="mt-12">
+          <h2 class="mb-6 text-2xl font-medium text-text-secondary">More like this</h2>
+          <div class="mx-auto grid max-w-none grid-cols-2 gap-6 max-md:grid-cols-1">
+            {
+              altPalettes.map((data) => (
+                <a
+                  href={`/palette/${data.id}/`}
+                  class="group relative m-0 w-auto rounded-[18px] bg-surface p-2.5 shadow-card no-underline transition-transform hover:scale-[1.02]"
+                >
+                  <img
+                    src={data.imageUrl}
+                    alt={`${primaryHue} color palette from curated photo`}
+                    width="800"
+                    height="600"
+                    loading="eager"
+                    decoding="async"
+                    class="w-full rounded-[6px]"
+                  />
+                  <div class="color-panel flex items-center justify-center gap-8 px-8 py-6 max-[480px]:gap-4 max-[480px]:px-4 max-[480px]:py-4">
+                    {data.palette.map((color) => (
+                      <div class="flex flex-col items-center gap-2">
+                        <div
+                          class="color h-12 w-12 rounded-full shadow-md max-[480px]:h-10 max-[480px]:w-10"
+                          style={`background-color: ${rgbToCss(color.rgb)}`}
+                        >
+                        </div>
+                        <span class="text-sm font-mono text-text-secondary">{color.hex}</span>
+                      </div>
+                    ))}
+                  </div>
+                </a>
+              ))
+            }
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+</BaseLayout>

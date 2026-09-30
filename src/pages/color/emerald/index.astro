@@ -1,0 +1,147 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+
+const primaryHue = "Emerald";
+
+const publicPalettes = [
+  {
+    "id": 241,
+    "imageUrl": "/unsplash_images/img241.jpg",
+    "palette": [
+      {
+        "rgb": [
+          3,
+          97,
+          79
+        ],
+        "hex": "#03614f"
+      },
+      {
+        "rgb": [
+          22,
+          40,
+          38
+        ],
+        "hex": "#162826"
+      },
+      {
+        "rgb": [
+          196,
+          179,
+          155
+        ],
+        "hex": "#c4b39b"
+      },
+      {
+        "rgb": [
+          121,
+          99,
+          102
+        ],
+        "hex": "#796366"
+      }
+    ],
+    "tags": [
+      "Emerald",
+      "Sand",
+      "Dark",
+      "Moody"
+    ],
+    "tier": "public",
+    "primaryHue": "Emerald"
+  }
+];
+const altPalettes = [];
+
+function rgbToCss(rgb: number[]) {
+  return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+}
+---
+
+<BaseLayout
+  title="Emerald color palette | ImageHues"
+  description="Explore 1 emerald color palette from curated photos. Click to copy hex codes."
+  canonicalPath="/color/emerald/"
+  skipJsonLd={true}
+>
+  <div class="mx-auto max-w-[1200px] px-6 max-[480px]:px-4">
+    <div class="py-16 max-lg:py-12">
+      <h1
+        class="mb-8 font-sans text-[48px] leading-[56px] font-medium text-text-primary max-md:text-[36px] max-md:leading-[44px] max-[480px]:text-[28px] max-[480px]:leading-[36px]"
+      >
+        Emerald color palette
+      </h1>
+
+      <div class="mx-auto max-w-[800px]">
+        {
+          publicPalettes.map((data) => (
+            <a
+              href={`/palette/${data.id}/`}
+              class="group relative m-0 w-auto rounded-[18px] bg-surface p-2.5 shadow-card no-underline transition-transform hover:scale-[1.02]"
+            >
+              <img
+                src={data.imageUrl}
+                alt={`${primaryHue} color palette from curated photo`}
+                width="800"
+                height="600"
+                loading="eager"
+                decoding="async"
+                class="w-full rounded-[6px]"
+              />
+              <div class="color-panel flex items-center justify-center gap-8 px-8 py-6 max-[480px]:gap-4 max-[480px]:px-4 max-[480px]:py-4">
+                {data.palette.map((color) => (
+                  <div class="flex flex-col items-center gap-2">
+                    <div
+                      class="color h-12 w-12 rounded-full shadow-md max-[480px]:h-10 max-[480px]:w-10"
+                      style={`background-color: ${rgbToCss(color.rgb)}`}
+                    >
+                    </div>
+                    <span class="text-sm font-mono text-text-secondary">{color.hex}</span>
+                  </div>
+                ))}
+              </div>
+            </a>
+          ))
+        }
+      </div>
+
+      {altPalettes.length > 0 && (
+        <div class="mt-12">
+          <h2 class="mb-6 text-2xl font-medium text-text-secondary">More like this</h2>
+          <div class="mx-auto grid max-w-none grid-cols-2 gap-6 max-md:grid-cols-1">
+            {
+              altPalettes.map((data) => (
+                <a
+                  href={`/palette/${data.id}/`}
+                  class="group relative m-0 w-auto rounded-[18px] bg-surface p-2.5 shadow-card no-underline transition-transform hover:scale-[1.02]"
+                >
+                  <img
+                    src={data.imageUrl}
+                    alt={`${primaryHue} color palette from curated photo`}
+                    width="800"
+                    height="600"
+                    loading="eager"
+                    decoding="async"
+                    class="w-full rounded-[6px]"
+                  />
+                  <div class="color-panel flex items-center justify-center gap-8 px-8 py-6 max-[480px]:gap-4 max-[480px]:px-4 max-[480px]:py-4">
+                    {data.palette.map((color) => (
+                      <div class="flex flex-col items-center gap-2">
+                        <div
+                          class="color h-12 w-12 rounded-full shadow-md max-[480px]:h-10 max-[480px]:w-10"
+                          style={`background-color: ${rgbToCss(color.rgb)}`}
+                        >
+                        </div>
+                        <span class="text-sm font-mono text-text-secondary">{color.hex}</span>
+                      </div>
+                    ))}
+                  </div>
+                </a>
+              ))
+            }
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+</BaseLayout>
