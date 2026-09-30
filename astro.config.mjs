@@ -4,9 +4,24 @@ import tailwindcss from '@tailwindcss/vite';
 
 const site = 'https://imagehues.com';
 
+const publicAltPalettePaths = [
+  '/palette/10/',
+  '/palette/15/',
+  '/palette/23/',
+  '/palette/55/',
+  '/palette/60/',
+  '/palette/113/',
+  '/palette/118/',
+  '/palette/239/',
+];
+
 export default defineConfig({
   site,
-  integrations: [sitemap()],
+  integrations: [
+    sitemap({
+      filter: (page) => !publicAltPalettePaths.some(path => page.endsWith(path)),
+    }),
+  ],
   build: {
     format: 'directory',
   },

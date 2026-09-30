@@ -5,12 +5,13 @@ export interface Props {
   canonicalPath: string;
   scripts?: string[];
   includeUrlMap?: boolean;
+  robots?: string;
 }
 
 const site = 'https://imagehues.com';
 const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
 
-const { title, description, canonicalPath, scripts = [], includeUrlMap = false } = Astro.props;
+const { title, description, canonicalPath, scripts = [], includeUrlMap = false, robots } = Astro.props;
 const canonical = `${site}${canonicalPath}`;
 const ogImage = `${site}/images/OG_Image.png`;
 const hasGa = gaId && gaId !== 'G-XXXXXXXXXX';
@@ -37,6 +38,7 @@ const jsonLd = {
     <title>{title}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
+    {robots && <meta name="robots" content={robots} />}
     <link rel="canonical" href={canonical} />
     <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap-index.xml" />
     <meta property="og:type" content="website" />
