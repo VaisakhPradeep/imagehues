@@ -15,11 +15,16 @@ const publicAltPalettePaths = [
   '/palette/239/',
 ];
 
+const excludedPaths = [
+  ...publicAltPalettePaths,
+  '/favourites/',
+];
+
 export default defineConfig({
   site,
   integrations: [
     sitemap({
-      filter: (page) => !publicAltPalettePaths.some(path => page.endsWith(path)),
+      filter: (page) => !excludedPaths.some(path => page.endsWith(path)),
     }),
   ],
   build: {

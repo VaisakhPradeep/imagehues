@@ -6,29 +6,46 @@ export interface Props {
   scripts?: string[];
   includeUrlMap?: boolean;
   robots?: string;
+  imageUrl?: string;
 }
 
 const site = 'https://imagehues.com';
 const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
 
-const { title, description, canonicalPath, scripts = [], includeUrlMap = false, robots } = Astro.props;
+const { title, description, canonicalPath, scripts = [], includeUrlMap = false, robots, imageUrl } = Astro.props;
 const canonical = `${site}${canonicalPath}`;
 const ogImage = `${site}/images/OG_Image.png`;
 const hasGa = gaId && gaId !== 'G-XXXXXXXXXX';
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'WebApplication',
-  name: 'Image Hues',
-  url: site,
-  applicationCategory: 'DesignApplication',
-  operatingSystem: 'Any',
-  description,
-  offers: {
-    '@type': 'Offer',
-    price: '0',
-    priceCurrency: 'USD',
-  },
-};
+
+const isPalettePage = canonicalPath.startsWith('/palette/');
+
+let jsonLd;
+if (isPalettePage && imageUrl) {
+  jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ImageObject',
+    name: title,
+    description,
+    url: canonical,
+    contentUrl: `${site}${imageUrl}`,
+    image: `${site}${imageUrl}`,
+  };
+} else {
+  jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'Image Hues',
+    url: site,
+    applicationCategory: 'DesignApplication',
+    operatingSystem: 'Any',
+    description,
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+    },
+  };
+}
 ---
 
 <!DOCTYPE html>
