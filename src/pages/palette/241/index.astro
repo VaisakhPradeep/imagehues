@@ -1,0 +1,94 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const id = 241;
+const primaryHue = "Emerald";
+const tags = ["Emerald","Sand","Dark","Moody"];
+const palette = [{"rgb":[3,97,79],"hex":"#03614f"},{"rgb":[22,40,38],"hex":"#162826"},{"rgb":[196,179,155],"hex":"#c4b39b"},{"rgb":[121,99,102],"hex":"#796366"}];
+const tier = "public";
+const imageUrl = "/unsplash_images/img241.jpg";
+
+function rgbToCss(rgb: number[]) {
+  return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+}
+---
+
+<BaseLayout
+  title="Emerald color palette — #03614f #162826 #c4b39b #796366 | ImageHues"
+  description="Explore this emerald color palette extracted from a curated photo. Emerald, Sand, Dark, Moody tones. Click to copy hex codes."
+  canonicalPath="/palette/241/"
+>
+  
+  <div class="mx-auto max-w-[1200px] px-6 max-[480px]:px-4">
+    <div class="py-16 max-lg:py-12">
+      <h1
+        class="mb-8 font-sans text-[48px] leading-[56px] font-medium text-text-primary max-md:text-[36px] max-md:leading-[44px] max-[480px]:text-[28px] max-[480px]:leading-[36px]"
+      >
+        Emerald color palette — #03614f #162826 #c4b39b #796366 | ImageHues
+      </h1>
+
+      <div class="mx-auto max-w-[800px]">
+        <div
+          class="group relative m-0 w-auto rounded-[18px] bg-surface p-2.5 shadow-card"
+        >
+          <img
+            src={imageUrl}
+            alt="Emerald color palette from curated photo"
+            width="800"
+            height="600"
+            loading="eager"
+            decoding="async"
+            class="w-full rounded-[6px]"
+          />
+          <div class="color-panel flex items-center justify-between px-[30px] py-4 max-[480px]:p-4">
+            {palette.map((color) => (
+              <div
+                class="color group/color relative h-6 w-6 animate-scale cursor-pointer rounded-full bg-background max-[480px]:h-[20px] max-[480px]:w-[20px]"
+                style={`background-color: ${rgbToCss(color.rgb)}`}
+                onclick="onColorClick(event)"
+              >
+                <div class="tooltip absolute -bottom-[35px] z-[100] hidden rounded bg-text-primary text-text-inverse group-hover/color:block">
+                  <span>{color.hex}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div class="mt-8">
+          <h2 class="mb-4 text-[24px] font-medium text-text-primary">Color Tags</h2>
+          <div class="flex flex-wrap gap-2">
+            {tags.map((tag) => (
+              <span class="rounded-full bg-surface px-4 py-2 text-sm text-text-secondary">
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div class="mt-8">
+          <a
+            href="/"
+            class="inline-block rounded-lg bg-surface px-6 py-3 text-text-primary no-underline transition-opacity hover:opacity-80"
+          >
+            ← Back to all palettes
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script is:inline>
+  function onColorClick(event) {
+    const hex = event.currentTarget.querySelector('.tooltip span').textContent;
+    navigator.clipboard.writeText(hex);
+    
+    const tooltip = event.currentTarget.querySelector('.tooltip');
+    const originalText = tooltip.textContent;
+    tooltip.textContent = 'Copied!';
+    setTimeout(() => {
+      tooltip.textContent = originalText;
+    }, 1000);
+  }
+</script>
