@@ -107,8 +107,9 @@ function rgbToCss(rgb: number[]) {
 
 <BaseLayout
   title="Lime color palette | ImageHues"
-  description="Explore 2 lime color palettes from curated photos. Click to copy hex codes."
+  description="Explore 1 lime color palette from curated photos. Click to copy hex codes."
   canonicalPath="/color/lime/"
+  skipJsonLd={true}
 >
   <div class="mx-auto max-w-[1200px] px-6 max-[480px]:px-4">
     <div class="py-16 max-lg:py-12">
@@ -118,7 +119,7 @@ function rgbToCss(rgb: number[]) {
         Lime color palette
       </h1>
 
-      <div class="mx-auto max-w-[600px]">
+      <div class="mx-auto max-w-[800px]">
         {
           publicPalettes.map((data) => (
             <a
@@ -154,7 +155,7 @@ function rgbToCss(rgb: number[]) {
       {altPalettes.length > 0 && (
         <div class="mt-12">
           <h2 class="mb-6 text-2xl font-medium text-text-secondary">More like this</h2>
-          <div class="mx-auto max-w-[600px]">
+          <div class="mx-auto max-w-[800px]">
             {
               altPalettes.map((data) => (
                 <a
